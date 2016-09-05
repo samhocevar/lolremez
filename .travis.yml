@@ -1,0 +1,33 @@
+sudo: required
+dist: trusty
+language: c++
+env: VERBOSE=1
+
+addons:
+  apt:
+    packages:
+      - build-essential
+      - automake
+      - autoconf
+      - libtool
+      - pkg-config
+      - libsdl2-dev
+      - libsdl2-image-dev
+      - libsdl2-mixer-dev
+      - libglew-dev
+      # this can fix clang compilation
+      - clang-3.8
+      - libc++-dev
+
+before_install:
+  - if [ "$CC" = "clang" ]; then export CC="clang-3.8"; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.8 -stdlib=libc++"; fi
+  - ./bootstrap
+
+os:
+  - linux
+
+compiler:
+  - gcc
+  - clang
+
