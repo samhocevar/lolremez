@@ -5,3 +5,5 @@ ACLOCAL_AMFLAGS = -I lol/build/autotools/m4
 
 SUBDIRS = lol roflmao
 
+test: check
+
