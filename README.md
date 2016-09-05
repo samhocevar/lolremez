@@ -1,5 +1,8 @@
 # roflmao
 
+[![Build Status (Travis-CI)](https://travis-ci.org/lolengine/lol-roflmao.svg?branch=master)](https://travis-ci.org/lolengine/lol-roflmao)
+[![Build Status (Semaphore-CI)](https://semaphoreci.com/api/v1/samhocevar/lol-roflmao/branches/master/badge.svg)](https://semaphoreci.com/samhocevar/lol-roflmao)
+
 `roflmao` is a simple project using Lol Engine. If you want to get
 started with Lol Engine, you may either:
 
@@ -28,6 +31,8 @@ to modify the following files:
     Makefile.am
     roflmao/Makefile.am
     roflmao/roflmao.cpp
+
+You can of course have several projects in the same repository.
 
 ## Build
 
