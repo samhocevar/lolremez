@@ -50,14 +50,11 @@ perf.data*
 *.csproj.user
 binaries/*Debug
 binaries/*Release
-build/.vs
-build/*.VC.VC.opendb
-build/*.VC.db
-build/*.sdf
-build/*.suo
-build/*.opensdf
-build/visualstudio/ipch
-build/visualstudio/*.log
-build/visualstudio/*.XGD
+.vs
+*.VC.VC.opendb
+*.VC.db
+*.sdf
+*.suo
+*.opensdf
 # ReSharper cruft
 _ReSharper.*
