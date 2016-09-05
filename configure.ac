@@ -31,6 +31,7 @@ dnl
 dnl  Inherit all Lol Engine checks
 dnl
 
+LOL_AC_INIT()
 LOL_AC_CHECK()
 LOL_AC_SUBST()
 
