@@ -1,0 +1,3 @@
+[submodule "lol"]
+	path = lol
+	url = ../../lolengine/lol.git

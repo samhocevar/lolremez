@@ -1,0 +1,17 @@
+# Visual Studio wants crlf, but if we do so, git will
+# normalise files and git-svn will push LF files to SVN,
+# so we revert back to binary.
+*.sln     -text
+*.csproj  -text
+*.vcxproj -text
+
+# Vim doesn't like CRLF, even on Windows
+*.vim eol=lf
+
+# Source files should be normalised in the repository
+*.c     eol=lf
+*.cpp   eol=lf
+*.cc    eol=lf
+*.h     eol=lf
+*.hh    eol=lf
+*.lolfx eol=lf
