@@ -4,7 +4,7 @@
 started with Lol Engine, you may either:
 
  - fork this project
- - duplicate this project (see [https://help.github.com/articles/duplicating-a-repository/](“duplicating a repository”))
+ - duplicate this project (see [“duplicating a repository”](https://help.github.com/articles/duplicating-a-repository/))
 
 ## Setup
 
