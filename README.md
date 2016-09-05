@@ -13,7 +13,7 @@ started with Lol Engine, you may either:
 
 Make sure Lol Engine and its submodules are properly initialised:
 
-    git submodules update --init --recursive
+    git submodule update --init --recursive
 
 On Linux, make sure the following packages are installed:
 
