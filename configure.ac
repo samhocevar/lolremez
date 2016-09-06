@@ -23,6 +23,7 @@ dnl  Build and configure Lol Engine before our repository
 dnl  Ensure $lol_srcdir and $lol_builddir are properly set up
 dnl
 
+ac_configure_args="${ac_configure_args} --disable-test --disable-doc --disable-tutorial --disable-samples"
 AC_CONFIG_SUBDIRS([lol])
 AC_SUBST(lol_srcdir, '${top_srcdir}/lol')
 AC_SUBST(lol_builddir, '${top_builddir}/lol')
