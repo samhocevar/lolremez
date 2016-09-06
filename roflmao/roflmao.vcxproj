@@ -37,10 +37,10 @@
     <ProjectReference Include="$(LolDir)\src\lol-core.vcxproj">
       <Project>{9e62f2fe-3408-4eae-8238-fd84238ceeda}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(LolDir)\src\bullet\lol-bullet.vcxproj">
+    <ProjectReference Include="$(LolDir)\src\3rdparty\lol-bullet.vcxproj">
       <Project>{83d3b207-c601-4025-8f41-01dedc354661}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(LolDir)\src\lua\lol-lua.vcxproj">
+    <ProjectReference Include="$(LolDir)\src\3rdparty\lol-lua.vcxproj">
       <Project>{d84021ca-b233-4e0f-8a52-071b83bbccc4}</Project>
     </ProjectReference>
   </ItemGroup>
