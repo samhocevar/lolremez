@@ -18,32 +18,20 @@ AC_PROG_CXX
 AM_PROG_LIBTOOL
 AC_LIBTOOL_CXX
 
-dnl
-dnl  Build and configure Lol Engine before our repository
-dnl  Ensure $lol_srcdir and $lol_builddir are properly set up
-dnl
-
-ac_configure_args="${ac_configure_args} --disable-test --disable-doc --disable-tutorial --disable-samples"
-AC_CONFIG_SUBDIRS([lol])
-AC_SUBST(lol_srcdir, '${top_srcdir}/lol')
-AC_SUBST(lol_builddir, '${top_builddir}/lol')
+AC_CONFIG_FILES(
+ [Makefile
+  roflmao/Makefile
+])
 
 dnl
 dnl  Inherit all Lol Engine checks
 dnl
 
-LOL_AC_INIT()
-LOL_AC_CHECK()
-LOL_AC_SUBST()
+LOL_AC_SUBPROJECT()
 
 dnl
-dnl  Export automake variables and write makefiles
+dnl  Perform the actual commands
 dnl
-
-AC_CONFIG_FILES(
- [Makefile
-  roflmao/Makefile
-])
 
 AC_OUTPUT
 

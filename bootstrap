@@ -1,8 +1,8 @@
 #!/bin/sh
 
-# Bootstrap Lol Engine first
-(cd lol && ./bootstrap)
-
-# Then bootstrap this project, using the same script
+# Bootstrap this project first, using the Lol Engine script
 ./lol/bootstrap
+
+# Then bootstrap Lol Engine itself
+(cd lol && ./bootstrap)
 
