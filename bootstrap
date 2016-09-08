@@ -1,5 +1,18 @@
 #!/bin/sh
 
+# Check that the repository is properly set up
+if [ ! -x "./lol/bootstrap" ]; then
+cat << EOF
+Error: cannot execute lol/bootstrap
+
+Did you configure the Lol Engine submodule? The following may help:
+
+    git submodule update --init --recursive
+
+EOF
+    exit 1
+fi
+
 # Bootstrap this project first, using the Lol Engine script
 ./lol/bootstrap
 
