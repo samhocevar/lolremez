@@ -10,7 +10,7 @@
 
 int main(int argc, char **argv)
 {
-    lol::System::Init(argc, argv);
+    lol::sys::init(argc, argv);
     return EXIT_SUCCESS;
 }
 

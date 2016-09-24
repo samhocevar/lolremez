@@ -23,14 +23,14 @@ On Linux, make sure the following packages are installed:
 
 ## Configure
 
-The default application is called `roflmao` and lies in its own subdirectory.
+The default application is called `roflmao` and lies in the `src` subdirectory.
 You should rename it to whatever your application will be called. Make sure
 to modify the following files:
 
     configure.ac
     Makefile.am
-    roflmao/Makefile.am
-    roflmao/roflmao.cpp
+    src/Makefile.am
+    src/roflmao.cpp
 
 You can of course have several projects in the same repository.
 

@@ -20,7 +20,7 @@ AC_LIBTOOL_CXX
 
 AC_CONFIG_FILES(
  [Makefile
-  roflmao/Makefile
+  src/Makefile
 ])
 
 dnl
