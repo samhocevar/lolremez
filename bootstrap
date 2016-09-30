@@ -14,8 +14,8 @@ EOF
 fi
 
 # Bootstrap this project first, using the Lol Engine script
-./lol/bootstrap
+./lol/bootstrap || exit $?
 
 # Then bootstrap Lol Engine itself
-(cd lol && ./bootstrap)
+cd lol && exec ./bootstrap
 
