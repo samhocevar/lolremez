@@ -27,10 +27,12 @@ The default application is called `roflmao` and lies in the `src` subdirectory.
 You should rename it to whatever your application will be called. Make sure
 to modify the following files:
 
-    configure.ac
-    Makefile.am
-    src/Makefile.am
     src/roflmao.cpp
+    configure.ac (Linux/Unix)
+    Makefile.am (Linux/Unix)
+    src/Makefile.am (Linux/Unix)
+    roflmao.sln (Windows)
+    src/roflmao.vcxproj (Windows)
 
 You can of course have several projects in the same repository.
 

@@ -45,7 +45,7 @@
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{3d02b33d-c348-43c8-ab6a-fb6e6f3c0e7c}</ProjectGuid>
+    <ProjectGuid>{ffffffff-ffff-ffff-ffff-ffffffffffff}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
