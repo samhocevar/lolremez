@@ -24,11 +24,16 @@
 class remez_solver
 {
 public:
-    remez_solver(int order, int decimals);
+    remez_solver();
     ~remez_solver();
 
-    void run(lol::real a, lol::real b,
-             char const *func, char const *weight = nullptr);
+    void set_order(int order);
+    void set_decimals(int decimals);
+    void set_range(lol::real xmin, lol::real xmax);
+    void set_func(char const *func);
+    void set_weight(char const *weight);
+
+    void run();
 
     bool show_stats = false;
 
@@ -51,8 +56,11 @@ private:
 private:
     /* User-defined parameters */
     expression m_func, m_weight;
-    int m_order, m_decimals;
-    bool m_has_weight;
+    lol::real m_xmin = -lol::real::R_1();
+    lol::real m_xmax = +lol::real::R_1();
+    int m_order = 4;
+    int m_decimals = 20;
+    bool m_has_weight = false;
 
     /* Solver state */
     lol::polynomial<lol::real> m_estimate;

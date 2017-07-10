@@ -26,10 +26,7 @@
 
 using lol::real;
 
-remez_solver::remez_solver(int order, int decimals)
-  : m_order(order),
-    m_decimals(decimals),
-    m_has_weight(false)
+remez_solver::remez_solver()
 {
     /* Spawn 4 worker threads */
     for (int i = 0; i < 4; ++i)
@@ -53,18 +50,38 @@ remez_solver::~remez_solver()
         delete worker;
 }
 
-void remez_solver::run(real a, real b, char const *func, char const *weight)
+void remez_solver::set_order(int order)
+{
+    m_order = order;
+}
+
+void remez_solver::set_decimals(int decimals)
+{
+    m_decimals = decimals;
+}
+
+void remez_solver::set_range(real a, real b)
+{
+    m_xmin = a;
+    m_xmax = b;
+}
+
+void remez_solver::set_func(char const *func)
 {
     m_func.parse(func);
+}
 
+void remez_solver::set_weight(char const *weight)
+{
     if (weight)
-    {
         m_weight.parse(weight);
-        m_has_weight = true;
-    }
+    m_has_weight = !!weight;
+}
 
-    m_k1 = (b + a) / 2;
-    m_k2 = (b - a) / 2;
+void remez_solver::run()
+{
+    m_k1 = (m_xmax + m_xmin) / 2;
+    m_k2 = (m_xmax - m_xmin) / 2;
     m_epsilon = pow((real)10, (real)-(m_decimals + 2));
 
     remez_init();

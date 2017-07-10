@@ -69,10 +69,9 @@ static void FAIL(char const *message = nullptr)
 /* See the tutorial at http://lolengine.net/wiki/doc/maths/remez */
 int main(int argc, char **argv)
 {
-    String xmin("-1"), xmax("1");
-    char const *f = nullptr, *g = nullptr;
-    int degree = 4;
     bool show_stats = false;
+
+    remez_solver solver;
 
     lol::getopt opt(argc, argv);
     opt.add_opt('h', "help",    false);
@@ -90,14 +89,17 @@ int main(int argc, char **argv)
         switch (c)
         {
         case 'd': /* --degree */
-            degree = atoi(opt.arg);
+            solver.set_order(atoi(opt.arg));
             break;
         case 'r': { /* --range */
             array<String> arg = String(opt.arg).split(':');
             if (arg.count() != 2)
                 FAIL("invalid range");
-            xmin = arg[0];
-            xmax = arg[1];
+            real xmin(arg[0].C());
+            real xmax(arg[1].C());
+            if (xmin >= xmax)
+                FAIL("invalid range");
+            solver.set_range(xmin, xmax);
           } break;
         case 300: /* --stats */
             show_stats = true;
@@ -113,23 +115,20 @@ int main(int argc, char **argv)
         }
     }
 
-    if (opt.index < argc)
-        f = argv[opt.index++];
-
-    if (opt.index < argc)
-        g = argv[opt.index++];
-
-    if (!f)
+    if (opt.index >= argc)
         FAIL("no function specified");
-    else if (opt.index < argc)
+
+    if (opt.index < argc)
+        solver.set_func(argv[opt.index++]);
+
+    if (opt.index < argc)
+        solver.set_weight(argv[opt.index++]);
+
+    if (opt.index < argc)
         FAIL("too many arguments");
 
-    if (real(xmin.C()) >= real(xmax.C()))
-        FAIL("invalid range");
-
-    remez_solver solver(degree, 20);
     solver.show_stats = show_stats;
-    solver.run(xmin.C(), xmax.C(), f, g);
+    solver.run();
 
     return 0;
 }
