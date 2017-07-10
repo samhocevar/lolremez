@@ -189,8 +189,11 @@ void remez_solver::remez_step()
     for (int i = 0; i < m_order + 2; i++)
         error += system[m_order + 1][i] * fxn[i];
 
-    using std::printf;
-    printf(" -:- timing for inversion: %f ms\n", t.Get() * 1000.f);
+    if (show_stats)
+    {
+        using std::printf;
+        printf(" -:- timing for inversion: %f ms\n", t.Get() * 1000.f);
+    }
 }
 
 /*
@@ -240,8 +243,11 @@ void remez_solver::find_zeroes()
         m_questions.push(i);
     }
 
-    using std::printf;
-    printf(" -:- timing for zeroes: %f ms\n", t.Get() * 1000.f);
+    if (show_stats)
+    {
+        using std::printf;
+        printf(" -:- timing for zeroes: %f ms\n", t.Get() * 1000.f);
+    }
 }
 
 /*
@@ -300,11 +306,14 @@ void remez_solver::find_extrema()
         m_questions.push(i);
     }
 
-    using std::printf;
-    printf(" -:- timing for extrema: %f ms\n", t.Get() * 1000.f);
-    printf(" -:- error: ");
-    m_error.print(m_decimals);
-    printf("\n");
+    if (show_stats)
+    {
+        using std::printf;
+        printf(" -:- timing for extrema: %f ms\n", t.Get() * 1000.f);
+        printf(" -:- error: ");
+        m_error.print(m_decimals);
+        printf("\n");
+    }
 }
 
 void remez_solver::print_poly()
@@ -316,14 +325,17 @@ void remez_solver::print_poly()
     polynomial<real> r = m_estimate.eval(q);
 
     using std::printf;
-    printf("\n");
+    if (show_stats)
+        printf("\n");
     for (int j = 0; j < m_order + 1; j++)
     {
         printf(j > 0 && r[j] >= real::R_0() ? "+" : "");
         r[j].print(m_decimals);
         printf(j == 0 ? "" : j > 1 ? "*x**%d" : "*x", j);
     }
-    printf("\n\n");
+    printf("\n");
+    if (show_stats)
+        printf("\n");
 }
 
 real remez_solver::eval_estimate(real const &x)

@@ -30,6 +30,8 @@ public:
     void run(lol::real a, lol::real b,
              char const *func, char const *weight = nullptr);
 
+    bool show_stats = false;
+
 private:
     void remez_init();
     void remez_step();

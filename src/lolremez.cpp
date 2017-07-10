@@ -47,6 +47,7 @@ static void usage()
     printf("Mandatory arguments to long options are mandatory for short options too.\n");
     printf("  -d, --degree <degree>      degree of final polynomial\n");
     printf("  -r, --range <xmin>:<xmax>  range over which to approximate\n");
+    printf("      --stats                print timing statistics\n");
     printf("  -h, --help                 display this help and exit\n");
     printf("  -V, --version              output version information and exit\n");
     printf("\n");
@@ -71,12 +72,14 @@ int main(int argc, char **argv)
     String xmin("-1"), xmax("1");
     char const *f = nullptr, *g = nullptr;
     int degree = 4;
+    bool show_stats = false;
 
     lol::getopt opt(argc, argv);
     opt.add_opt('h', "help",    false);
     opt.add_opt('v', "version", false);
     opt.add_opt('d', "degree",  true);
     opt.add_opt('r', "range",   true);
+    opt.add_opt(300, "stats",   false);
 
     for (;;)
     {
@@ -96,6 +99,9 @@ int main(int argc, char **argv)
             xmin = arg[0];
             xmax = arg[1];
           } break;
+        case 300: /* --stats */
+            show_stats = true;
+            break;
         case 'h': /* --help */
             usage();
             return EXIT_SUCCESS;
@@ -122,6 +128,7 @@ int main(int argc, char **argv)
         FAIL("invalid range");
 
     remez_solver solver(degree, 20);
+    solver.show_stats = show_stats;
     solver.run(xmin.C(), xmax.C(), f, g);
 
     return 0;
