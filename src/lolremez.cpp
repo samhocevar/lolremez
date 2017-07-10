@@ -78,7 +78,7 @@ int main(int argc, char **argv)
     opt.add_opt('v', "version", false);
     opt.add_opt('d', "degree",  true);
     opt.add_opt('r', "range",   true);
-    opt.add_opt(300, "stats",   false);
+    opt.add_opt(200, "stats",   false);
 
     for (;;)
     {
@@ -101,7 +101,7 @@ int main(int argc, char **argv)
                 FAIL("invalid range");
             solver.set_range(xmin, xmax);
           } break;
-        case 300: /* --stats */
+        case 200: /* --stats */
             show_stats = true;
             break;
         case 'h': /* --help */

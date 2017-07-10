@@ -39,6 +39,11 @@
     <ClCompile Include="lolremez.cpp" />
     <ClCompile Include="solver.cpp" />
   </ItemGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>PACKAGE_VERSION="0.3";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="$(LolDir)\src\lol-core.vcxproj">
       <Project>{9e62f2fe-3408-4eae-8238-fd84238ceeda}</Project>
