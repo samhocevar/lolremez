@@ -5,9 +5,9 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-core", "lol\src\lol-core.vcxproj", "{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-bullet", "lol\src\bullet\lol-bullet.vcxproj", "{83D3B207-C601-4025-8F41-01DEDC354661}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-bullet", "lol\src\3rdparty\lol-bullet.vcxproj", "{83D3B207-C601-4025-8F41-01DEDC354661}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-lua", "lol\src\lua\lol-lua.vcxproj", "{D84021CA-B233-4E0F-8A52-071B83BBCCC4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-lua", "lol\src\3rdparty\lol-lua.vcxproj", "{D84021CA-B233-4E0F-8A52-071B83BBCCC4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{1AFD580B-98B8-4689-B661-38C41132C60E}"
 	ProjectSection(SolutionItems) = preProject
