@@ -1,49 +1,18 @@
-# roflmao
+# LolRemez
 
-[![Build Status (Travis-CI)](https://travis-ci.org/lolengine/lol-roflmao.svg?branch=master)](https://travis-ci.org/lolengine/lol-roflmao)
-[![Build Status (Semaphore-CI)](https://semaphoreci.com/api/v1/samhocevar/lol-roflmao/branches/master/badge.svg)](https://semaphoreci.com/samhocevar/lol-roflmao)
+A Remez algorithm toolkit.
 
-`roflmao` is a simple project using Lol Engine. If you want to get
-started with Lol Engine, you may either:
+Documentation available here: http://lolengine.net/wiki/doc/maths/remez
 
- - fork this project
- - duplicate this project (see [“duplicating a repository”](https://help.github.com/articles/duplicating-a-repository/))
+### News for LolRemez 0.2:
 
-## Setup
+ - significant performance and accuracy improvements thanks to various
+   bugfixes and a better extrema finder for the error function.
+ - user can now define accuracy of the final result.
+ - exp(), sin(), cos() and tan() are now about 20% faster.
+ - multiplying a real number by an integer power of two is now a virtually
+   free operation.
+ - fixed a rounding bug in the real number printing routine.
 
-Make sure Lol Engine and its submodules are properly initialised:
-
-    git submodule update --init --recursive
-
-On Linux, make sure the following packages are installed:
-
-    automake autoconf libtool pkg-config
-    libglew-dev
-    libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev
-
-## Configure
-
-The default application is called `roflmao` and lies in the `src` subdirectory.
-You should rename it to whatever your application will be called. Make sure
-to modify the following files:
-
-    src/roflmao.cpp
-    configure.ac (Linux/Unix)
-    Makefile.am (Linux/Unix)
-    src/Makefile.am (Linux/Unix)
-    roflmao.sln (Windows)
-    src/roflmao.vcxproj (Windows)
-
-You can of course have several projects in the same repository.
-
-## Build
-
-Then bootstrap the project and configure it:
-
-    ./bootstrap
-    ./configure
-
-Finally, build the project:
-
-    make
+### Initial release: LolRemez 0.1
 

@@ -31,7 +31,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="roflmao.cpp" />
+    <ClInclude Include="expression.h" />
+    <ClInclude Include="matrix.h" />
+    <ClInclude Include="solver.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="lolremez.cpp" />
+    <ClCompile Include="solver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(LolDir)\src\lol-core.vcxproj">
@@ -45,7 +51,7 @@
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{ffffffff-ffff-ffff-ffff-ffffffffffff}</ProjectGuid>
+    <ProjectGuid>{5581ac22-33dd-40e3-ab32-3514a697057b}</ProjectGuid>
     <ConfigurationType>Application</ConfigurationType>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>

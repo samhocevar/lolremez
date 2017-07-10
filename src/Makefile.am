@@ -1,10 +1,13 @@
 
 include $(top_srcdir)/lol/build/autotools/common.am
 
-bin_PROGRAMS = roflmao
+EXTRA_DIST += NEWS.txt lolremez.sln lolremez.vcxproj lolremez.vcxproj.filters
 
-roflmao_SOURCES = roflmao.cpp
-roflmao_CPPFLAGS = $(AM_CPPFLAGS)
-roflmao_DEPENDENCIES = @LOL_DEPS@
-roflmao_LDFLAGS = $(AM_LDFLAGS)
+bin_PROGRAMS = lolremez
+
+lolremez_SOURCES = \
+    lolremez.cpp solver.cpp solver.h matrix.h expression.h
+lolremez_CPPFLAGS = $(AM_CPPFLAGS)
+lolremez_DEPENDENCIES = @LOL_DEPS@
+lolremez_LDFLAGS = $(AM_LDFLAGS)
 
