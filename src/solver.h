@@ -36,7 +36,7 @@ private:
     void remez_init();
     void remez_step();
 
-    void find_zeroes();
+    void find_zeros();
     void find_extrema();
 
     void worker_thread();
@@ -57,7 +57,7 @@ private:
     /* Solver state */
     lol::polynomial<lol::real> m_estimate;
 
-    lol::array<lol::real> m_zeroes;
+    lol::array<lol::real> m_zeros;
     lol::array<lol::real> m_control;
 
     lol::real m_k1, m_k2, m_epsilon, m_error;
@@ -67,7 +67,7 @@ private:
         lol::real x, err;
     };
 
-    lol::array<point, point, point> m_zeroes_state;
+    lol::array<point, point, point> m_zeros_state;
     lol::array<point, point, point> m_extrema_state;
 
     /* Threading information */

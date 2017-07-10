@@ -82,7 +82,7 @@ void remez_solver::run(real a, real b, char const *func, char const *weight)
             break;
 
         print_poly();
-        find_zeroes();
+        find_zeros();
     }
 
     print_poly();
@@ -94,11 +94,11 @@ void remez_solver::run(real a, real b, char const *func, char const *weight)
  */
 void remez_solver::remez_init()
 {
-    /* m_order + 1 zeroes of the error function */
-    m_zeroes.resize(m_order + 1);
+    /* m_order + 1 zeros of the error function */
+    m_zeros.resize(m_order + 1);
 
-    /* m_order + 1 zeroes to find */
-    m_zeroes_state.resize(m_order + 1);
+    /* m_order + 1 zeros to find */
+    m_zeros_state.resize(m_order + 1);
 
     /* m_order + 2 control points */
     m_control.resize(m_order + 2);
@@ -111,8 +111,8 @@ void remez_solver::remez_init()
     array<real> fxn;
     for (int i = 0; i < m_order + 1; i++)
     {
-        m_zeroes[i] = (real)(2 * i - m_order) / (real)(m_order + 1);
-        fxn.push(eval_func(m_zeroes[i]));
+        m_zeros[i] = (real)(2 * i - m_order) / (real)(m_order + 1);
+        fxn.push(eval_func(m_zeros[i]));
     }
 
     /* We build a matrix of Chebyshev evaluations: row i contains the
@@ -122,7 +122,7 @@ void remez_solver::remez_init()
     {
         auto p = polynomial<real>::chebyshev(n);
         for (int i = 0; i < m_order + 1; i++)
-            system[i][n] = p.eval(m_zeroes[i]);
+            system[i][n] = p.eval(m_zeros[i]);
     }
 
     /* Solve the system */
@@ -197,13 +197,13 @@ void remez_solver::remez_step()
 }
 
 /*
- * Find m_order + 1 zeroes of the error function. No need to compute the
- * relative error: its zeroes are at the same place as the absolute error!
+ * Find m_order + 1 zeros of the error function. No need to compute the
+ * relative error: its zeros are at the same place as the absolute error!
  *
  * The algorithm used here is naïve regula falsi. It still performs a lot
  * better than the midpoint algorithm.
  */
-void remez_solver::find_zeroes()
+void remez_solver::find_zeros()
 {
     Timer t;
 
@@ -213,8 +213,8 @@ void remez_solver::find_zeroes()
     /* Initialise an [a,b] bracket for each zero we try to find */
     for (int i = 0; i < m_order + 1; i++)
     {
-        point &a = m_zeroes_state[i].m1;
-        point &b = m_zeroes_state[i].m2;
+        point &a = m_zeros_state[i].m1;
+        point &b = m_zeros_state[i].m2;
 
         a.x = m_control[i];
         a.err = eval_estimate(a.x) - eval_func(a.x);
@@ -229,13 +229,13 @@ void remez_solver::find_zeroes()
     {
         int i = m_answers.pop();
 
-        point &a = m_zeroes_state[i].m1;
-        point &b = m_zeroes_state[i].m2;
-        point &c = m_zeroes_state[i].m3;
+        point &a = m_zeros_state[i].m1;
+        point &b = m_zeros_state[i].m2;
+        point &c = m_zeros_state[i].m3;
 
         if (c.err == zero || fabs(a.x - b.x) <= limit)
         {
-            m_zeroes[i] = c.x;
+            m_zeros[i] = c.x;
             ++finished;
             continue;
         }
@@ -246,7 +246,7 @@ void remez_solver::find_zeroes()
     if (show_stats)
     {
         using std::printf;
-        printf(" -:- timing for zeroes: %f ms\n", t.Get() * 1000.f);
+        printf(" -:- timing for zeros: %f ms\n", t.Get() * 1000.f);
     }
 }
 
@@ -274,8 +274,8 @@ void remez_solver::find_extrema()
         point &b = m_extrema_state[i].m2;
         point &c = m_extrema_state[i].m3;
 
-        a.x = m_zeroes[i];
-        b.x = m_zeroes[i + 1];
+        a.x = m_zeros[i];
+        b.x = m_zeros[i + 1];
         c.x = a.x + (b.x - a.x) * real(rand(0.4f, 0.6f));
 
         a.err = eval_error(a.x);
@@ -373,9 +373,9 @@ void remez_solver::worker_thread()
         }
         else if (i < 1000)
         {
-            point &a = m_zeroes_state[i].m1;
-            point &b = m_zeroes_state[i].m2;
-            point &c = m_zeroes_state[i].m3;
+            point &a = m_zeros_state[i].m1;
+            point &b = m_zeros_state[i].m2;
+            point &c = m_zeros_state[i].m3;
 
             real s = abs(b.err) / (abs(a.err) + abs(b.err));
             real newc = b.x + s * (a.x - b.x);
