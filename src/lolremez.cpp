@@ -47,6 +47,7 @@ static void usage()
     printf("Mandatory arguments to long options are mandatory for short options too.\n");
     printf("  -d, --degree <degree>      degree of final polynomial\n");
     printf("  -r, --range <xmin>:<xmax>  range over which to approximate\n");
+    printf("      --progress             print progress\n");
     printf("      --stats                print timing statistics\n");
     printf("  -h, --help                 display this help and exit\n");
     printf("  -V, --version              output version information and exit\n");
@@ -70,15 +71,17 @@ static void FAIL(char const *message = nullptr)
 int main(int argc, char **argv)
 {
     bool show_stats = false;
+    bool show_progress = false;
 
     remez_solver solver;
 
     lol::getopt opt(argc, argv);
-    opt.add_opt('h', "help",    false);
-    opt.add_opt('v', "version", false);
-    opt.add_opt('d', "degree",  true);
-    opt.add_opt('r', "range",   true);
-    opt.add_opt(200, "stats",   false);
+    opt.add_opt('h', "help",     false);
+    opt.add_opt('v', "version",  false);
+    opt.add_opt('d', "degree",   true);
+    opt.add_opt('r', "range",    true);
+    opt.add_opt(200, "stats",    false);
+    opt.add_opt(201, "progress", false);
 
     for (;;)
     {
@@ -104,6 +107,9 @@ int main(int argc, char **argv)
         case 200: /* --stats */
             show_stats = true;
             break;
+        case 201: /* --progress */
+            show_progress = true;
+            break;
         case 'h': /* --help */
             usage();
             return EXIT_SUCCESS;
@@ -118,8 +124,7 @@ int main(int argc, char **argv)
     if (opt.index >= argc)
         FAIL("no function specified");
 
-    if (opt.index < argc)
-        solver.set_func(argv[opt.index++]);
+    solver.set_func(argv[opt.index++]);
 
     if (opt.index < argc)
         solver.set_weight(argv[opt.index++]);
@@ -128,7 +133,14 @@ int main(int argc, char **argv)
         FAIL("too many arguments");
 
     solver.show_stats = show_stats;
-    solver.run();
+
+    for (solver.do_init(); solver.do_step(); )
+    {
+        if (show_progress)
+            solver.do_print(remez_solver::format::gnuplot);
+    }
+
+    solver.do_print(remez_solver::format::cpp);
 
     return 0;
 }

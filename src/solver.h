@@ -27,13 +27,21 @@ public:
     remez_solver();
     ~remez_solver();
 
+    enum class format
+    {
+        gnuplot,
+        cpp,
+    };
+
     void set_order(int order);
     void set_decimals(int decimals);
     void set_range(lol::real xmin, lol::real xmax);
     void set_func(char const *func);
     void set_weight(char const *weight);
 
-    void run();
+    void do_init();
+    bool do_step();
+    void do_print(format fmt);
 
     bool show_stats = false;
 
@@ -46,8 +54,6 @@ private:
 
     void worker_thread();
 
-    void print_poly();
-
     lol::real eval_estimate(lol::real const &x);
     lol::real eval_func(lol::real const &x);
     lol::real eval_weight(lol::real const &x);
@@ -55,6 +61,7 @@ private:
 
 private:
     /* User-defined parameters */
+    lol::String m_func_string, m_weight_string;
     expression m_func, m_weight;
     lol::real m_xmin = -lol::real::R_1();
     lol::real m_xmax = +lol::real::R_1();

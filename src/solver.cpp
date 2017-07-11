@@ -68,41 +68,42 @@ void remez_solver::set_range(real a, real b)
 
 void remez_solver::set_func(char const *func)
 {
+    m_func_string = func;
     m_func.parse(func);
 }
 
 void remez_solver::set_weight(char const *weight)
 {
     if (weight)
+    {
+        m_weight_string = weight;
         m_weight.parse(weight);
+    }
     m_has_weight = !!weight;
 }
 
-void remez_solver::run()
+void remez_solver::do_init()
 {
     m_k1 = (m_xmax + m_xmin) / 2;
     m_k2 = (m_xmax - m_xmin) / 2;
     m_epsilon = pow((real)10, (real)-(m_decimals + 2));
 
     remez_init();
-    print_poly();
+}
 
-    for (int n = 0; ; n++)
-    {
-        real old_error = m_error;
+bool remez_solver::do_step()
+{
+    real old_error = m_error;
 
-        find_extrema();
-        remez_step();
+    find_extrema();
+    remez_step();
 
-        if (m_error >= (real)0
-             && fabs(m_error - old_error) < m_error * m_epsilon)
-            break;
+    if (m_error >= (real)0
+         && fabs(m_error - old_error) < m_error * m_epsilon)
+        return false;
 
-        print_poly();
-        find_zeros();
-    }
-
-    print_poly();
+    find_zeros();
+    return true;
 }
 
 /*
@@ -333,7 +334,7 @@ void remez_solver::find_extrema()
     }
 }
 
-void remez_solver::print_poly()
+void remez_solver::do_print(remez_solver::format fmt)
 {
     /* Transform our polynomial in the [-1..1] range into a polynomial
      * in the [a..b] range by composing it with q:
@@ -342,17 +343,38 @@ void remez_solver::print_poly()
     polynomial<real> r = m_estimate.eval(q);
 
     using std::printf;
-    if (show_stats)
-        printf("\n");
-    for (int j = 0; j < m_order + 1; j++)
+
+    switch (fmt)
     {
-        printf(j > 0 && r[j] >= real::R_0() ? "+" : "");
-        r[j].print(m_decimals);
-        printf(j == 0 ? "" : j > 1 ? "*x**%d" : "*x", j);
-    }
-    printf("\n");
-    if (show_stats)
+    case remez_solver::format::gnuplot:
+        for (int j = 0; j < m_order + 1; j++)
+        {
+            printf(j > 0 && r[j] >= real::R_0() ? "+" : "");
+            r[j].print(m_decimals);
+            printf(j == 0 ? "" : j > 1 ? "*x**%d" : "*x", j);
+        }
         printf("\n");
+        break;
+    case remez_solver::format::cpp:
+        printf("/* Approximation of f(x) = %s\n", m_func_string.C());
+        if (m_has_weight)
+            printf(" * with weight function g(x) = %s\n", m_weight_string.C());
+        printf(" * on interval [ ");
+        m_xmin.print(m_decimals);
+        printf(", ");
+        m_xmax.print(m_decimals);
+        printf(" ]\n * with a polynomial of degree %d. */\n", m_order);
+        printf("float f(float x)\n{\n");
+        for (int j = m_order; j >= 0; --j)
+        {
+            char const *a = j ? "u = u * x +" : "return u * x +";
+            printf("    %s ", j == m_order ? "float u =" : a);
+            r[j].print(m_decimals);
+            printf("f;\n");
+        }
+        printf("}\n");
+        break;
+    }
 }
 
 real remez_solver::eval_estimate(real const &x)
