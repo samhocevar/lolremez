@@ -2,7 +2,7 @@
 
 A Remez algorithm toolkit to approximate functions using polynomials.
 
-A tutorial is available [[in the wiki section|Home]].
+A tutorial is available [in the wiki section](wiki).
 
 ## Example
 
@@ -33,7 +33,7 @@ float f(float x)
 
 Binary functions/operators:
 
- - + - * /
+ - \+ \- \* /
  - *atan2(y, x)*, *pow(x, y)*
  - *min(x, y)*, *max(x, y)*
 
