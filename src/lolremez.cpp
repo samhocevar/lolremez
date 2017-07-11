@@ -138,6 +138,7 @@ int main(int argc, char **argv)
     {
         if (show_progress)
             solver.do_print(remez_solver::format::gnuplot);
+        fflush(stdout);
     }
 
     solver.do_print(remez_solver::format::cpp);
