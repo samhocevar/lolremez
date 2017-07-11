@@ -1,7 +1,7 @@
 
 include $(top_srcdir)/lol/build/autotools/common.am
 
-EXTRA_DIST += NEWS.txt lolremez.sln lolremez.vcxproj lolremez.vcxproj.filters
+EXTRA_DIST += lolremez.vcxproj lolremez.vcxproj.filters
 
 bin_PROGRAMS = lolremez
 
