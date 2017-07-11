@@ -93,7 +93,7 @@ void remez_solver::do_init()
 
 bool remez_solver::do_step()
 {
-    real old_error = m_error;
+    real const old_error = m_error;
 
     find_extrema();
     remez_step();
@@ -184,7 +184,7 @@ void remez_solver::remez_step()
     /* The last line of the system is the oscillating error */
     for (int i = 0; i < m_order + 2; i++)
     {
-        real error = fabs(eval_weight(m_control[i]));
+        real const error = fabs(eval_weight(m_control[i]));
         system[i][m_order + 1] = (i & 1) ? error : -error;
     }
 
@@ -218,15 +218,16 @@ void remez_solver::remez_step()
  * Find m_order + 1 zeros of the error function. No need to compute the
  * relative error: its zeros are at the same place as the absolute error!
  *
- * The algorithm used here is naïve regula falsi. It still performs a lot
- * better than the midpoint algorithm.
+ * The algorithm used here is the midpoint algorithm, which is guaranteed
+ * to converge in fixed time. I tried naïve regula falsi which sometimes
+ * would be very efficient, but it often performed poorly.
  */
 void remez_solver::find_zeros()
 {
     Timer t;
 
-    static real const limit = ldexp((real)1, -500);
-    static real const zero = (real)0;
+    static real const limit = real("1e-150");
+    static real const zero = real("0");
 
     /* Initialise an [a,b] bracket for each zero we try to find */
     for (int i = 0; i < m_order + 1; i++)
@@ -247,9 +248,9 @@ void remez_solver::find_zeros()
     {
         int i = m_answers.pop();
 
-        point &a = m_zeros_state[i].m1;
-        point &b = m_zeros_state[i].m2;
-        point &c = m_zeros_state[i].m3;
+        point const &a = m_zeros_state[i].m1;
+        point const &b = m_zeros_state[i].m2;
+        point const &c = m_zeros_state[i].m3;
 
         if (c.err == zero || fabs(a.x - b.x) <= limit)
         {
@@ -275,7 +276,8 @@ void remez_solver::find_zeros()
  *
  * The algorithm used here is successive parabolic interpolation. FIXME: we
  * could use Brent’s method instead, which combines parabolic interpolation
- * and golden ratio search and has superlinear convergence.
+ * and golden ratio search and has superlinear convergence. However, the
+ * real bottleneck for now is the root finding, so this has low priority.
  */
 void remez_solver::find_extrema()
 {
@@ -308,11 +310,13 @@ void remez_solver::find_extrema()
     {
         int i = m_answers.pop();
 
-        point &a = m_extrema_state[i - 1000].m1;
-        point &b = m_extrema_state[i - 1000].m2;
-        point &c = m_extrema_state[i - 1000].m3;
+        point const &a = m_extrema_state[i - 1000].m1;
+        point const &b = m_extrema_state[i - 1000].m2;
+        point const &c = m_extrema_state[i - 1000].m3;
 
-        if (b.x - a.x <= m_epsilon)
+        static real const limit = real("1e-150");
+
+        if (b.x - a.x <= limit)
         {
             m_control[i - 1000 + 1] = c.x;
             if (c.err > m_error)
@@ -416,6 +420,8 @@ void remez_solver::worker_thread()
             point &b = m_zeros_state[i].m2;
             point &c = m_zeros_state[i].m3;
 
+#if 0
+            /* This (regula falsi) is actually really slow */
             real s = abs(b.err) / (abs(a.err) + abs(b.err));
             real newc = b.x + s * (a.x - b.x);
 
@@ -423,6 +429,9 @@ void remez_solver::worker_thread()
              * we may be at an inflection point. Use the midpoint to get
              * out of this situation. */
             c.x = newc != c.x ? newc : (a.x + b.x) / 2;
+#else
+            c.x = (a.x + b.x) / 2;
+#endif
             c.err = eval_estimate(c.x) - eval_func(c.x);
 
             if ((a.err < zero && c.err < zero)
@@ -440,9 +449,9 @@ void remez_solver::worker_thread()
             point &c = m_extrema_state[i - 1000].m3;
             point d;
 
-            real d1 = c.x - a.x, d2 = c.x - b.x;
-            real k1 = d1 * (c.err - b.err);
-            real k2 = d2 * (c.err - a.err);
+            real const d1 = c.x - a.x, d2 = c.x - b.x;
+            real const k1 = d1 * (c.err - b.err);
+            real const k2 = d2 * (c.err - a.err);
             d.x = c.x - (d1 * k1 - d2 * k2) / (k1 - k2) / 2;
 
             /* If parabolic interpolation failed, pick a number

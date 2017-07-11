@@ -38,7 +38,6 @@ float f(float x)
  - C/C++ function output.
  - use threading to find zeros and extrema.
  - use successive parabolic interpolation to find extrema.
- - use regula falsi method to find zeros.
 
 ### News for LolRemez 0.2:
 
