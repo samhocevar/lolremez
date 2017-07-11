@@ -1,8 +1,8 @@
 # LolRemez
 
-A Remez algorithm toolkit to approximate functions.
+A Remez algorithm toolkit to approximate functions using polynomials.
 
-Tutorial available here: http://lolengine.net/wiki/doc/maths/remez
+A tutorial is available [[in the wiki section|Home]].
 
 ## Example
 
@@ -28,6 +28,23 @@ float f(float x)
     return u * x + -7.6941172112944451609e-1f;
 }
 ```
+
+## Available functions
+
+Binary functions/operators:
+
+ - + - * /
+ - *atan2(y, x)*, *pow(x, y)*
+ - *min(x, y)*, *max(x, y)*
+
+Math functions:
+
+ - *abs()* (absolute value)
+ - *sqrt()* (square root), *cbrt()* (cubic root)
+ - *exp()*, *exp2()*, *log()*, *log2()*, *log10()*
+ - *sin()*, *cos()*, *tan()*
+ - *asin()*, *acos()*, *atan()*
+ - *sinh()*, *cosh()*, *tanh()*
 
 ## Changes
 
