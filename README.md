@@ -2,7 +2,7 @@
 
 A Remez algorithm toolkit to approximate functions using polynomials.
 
-A tutorial is available [in the wiki section](/samhocevar/lolremez/wiki).
+A tutorial is available [in the wiki section](https://github.com/samhocevar/lolremez/wiki).
 
 ## Example
 
