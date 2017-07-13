@@ -117,6 +117,18 @@ struct expression
         return stack.pop();
     }
 
+    /*
+     * Is expression constant? i.e. does not depend on x
+     */
+    bool is_constant() const
+    {
+        for (auto op : m_ops)
+            if (op.m1 == id::x)
+                return false;
+
+        return true;
+    }
+
 private:
     lol::array<id, int> m_ops;
     lol::array<lol::real> m_constants;

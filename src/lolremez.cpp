@@ -98,10 +98,17 @@ int main(int argc, char **argv)
             array<String> arg = String(opt.arg).split(':');
             if (arg.count() != 2)
                 FAIL("invalid range");
-            real xmin(arg[0].C());
-            real xmax(arg[1].C());
+            expression ex;
+            ex.parse(arg[0].C());
+            if (!ex.is_constant())
+                FAIL("invalid range: xmin must be constant");
+            real xmin = ex.eval(real::R_0());
+            ex.parse(arg[1].C());
+            if (!ex.is_constant())
+                FAIL("invalid range: xmin must be constant");
+            real xmax = ex.eval(real::R_0());
             if (xmin >= xmax)
-                FAIL("invalid range");
+                FAIL("invalid range: xmin >= xmax");
             solver.set_range(xmin, xmax);
           } break;
         case 200: /* --stats */
