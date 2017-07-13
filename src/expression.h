@@ -127,13 +127,18 @@ private:
     // r_ <- <blank> *
     struct _ : star<space> {};
 
-    // r_constant <- <digit> + ( "." <digit> * ) ? ( [eE] [+-] ? <digit> + ) ?
-    struct r_constant : seq<plus<digit>,
-                            opt<seq<one<'.'>,
-                                    star<digit>>>,
-                            opt<seq<one<'e', 'E'>,
-                                    opt<one<'+', '-'>>,
-                                    plus<digit>>>> {};
+    // r_number <- <digit> + ( "." <digit> * ) ? ( [eE] [+-] ? <digit> + ) ?
+    struct r_number : seq<plus<digit>,
+                          opt<seq<one<'.'>,
+                                  star<digit>>>,
+                          opt<seq<one<'e', 'E'>,
+                                  opt<one<'+', '-'>>,
+                                  plus<digit>>>> {};
+
+    // r_constant <- r_number / "e" / "pi"
+    struct r_constant : sor<r_number,
+                            pegtl_string_t("e"),
+                            pegtl_string_t("pi")> {};
 
     // r_var <- "x"
     struct r_var : pegtl_string_t("x") {};
@@ -337,9 +342,13 @@ struct expression::action<expression::r_constant>
 {
     static void apply(action_input const &in, expression *that)
     {
-        /* FIXME: check if the constant is already in the list */
         that->m_ops.push(id::constant, that->m_constants.count());
-        that->m_constants.push(lol::real(in.string().c_str()));
+        if (in.string() == "e")
+            that->m_constants.push(lol::real::R_E());
+        else if (in.string() == "pi")
+            that->m_constants.push(lol::real::R_PI());
+        else /* FIXME: check if the constant is already in the list */
+            that->m_constants.push(lol::real(in.string().c_str()));
     }
 };
 
