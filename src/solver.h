@@ -34,7 +34,7 @@ public:
     };
 
     void set_order(int order);
-    void set_decimals(int decimals);
+    void set_digits(int digits);
     void set_range(lol::real xmin, lol::real xmax);
     void set_func(char const *func);
     void set_weight(char const *weight);
@@ -66,7 +66,7 @@ private:
     lol::real m_xmin = -lol::real::R_1();
     lol::real m_xmax = +lol::real::R_1();
     int m_order = 4;
-    int m_decimals = 20;
+    int m_digits = 40;
     bool m_has_weight = false;
 
     /* Solver state */

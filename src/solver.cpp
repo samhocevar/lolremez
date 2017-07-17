@@ -55,9 +55,9 @@ void remez_solver::set_order(int order)
     m_order = order;
 }
 
-void remez_solver::set_decimals(int decimals)
+void remez_solver::set_digits(int digits)
 {
-    m_decimals = decimals;
+    m_digits = digits;
 }
 
 void remez_solver::set_range(real a, real b)
@@ -82,7 +82,7 @@ void remez_solver::do_init()
 {
     m_k1 = (m_xmax + m_xmin) / 2;
     m_k2 = (m_xmax - m_xmin) / 2;
-    m_epsilon = pow((real)10, (real)-(m_decimals + 2));
+    m_epsilon = pow((real)10, (real)-(m_digits + 2));
 
     remez_init();
 }
@@ -338,7 +338,7 @@ void remez_solver::find_extrema()
         using std::printf;
         printf(" -:- timing for extrema: %f ms\n", t.Get() * 1000.f);
         printf(" -:- error: ");
-        m_error.print(m_decimals);
+        m_error.print(m_digits);
         printf("\n");
     }
 }

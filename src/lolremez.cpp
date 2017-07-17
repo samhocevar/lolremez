@@ -14,6 +14,8 @@
 #   include "config.h"
 #endif
 
+#include <float.h>
+
 #include <lol/engine.h>
 
 #include <lol/math/real.h>
@@ -24,8 +26,6 @@
 using lol::array;
 using lol::real;
 using lol::String;
-
-static void print_poly(lol::polynomial<lol::real> const &p);
 
 static void version(void)
 {
@@ -73,7 +73,16 @@ static void FAIL(char const *message = nullptr)
 int main(int argc, char **argv)
 {
     lol::String str_xmin("-1"), str_xmax("1");
-    int decimals = 40;
+    enum
+    {
+        mode_float,
+        mode_double,
+        mode_long_double,
+
+        mode_default = mode_double,
+    }
+    mode = mode_default;
+
     bool has_weight = false;
     bool show_stats = false;
     bool show_progress = false;
@@ -85,8 +94,11 @@ int main(int argc, char **argv)
     opt.add_opt('v', "version",  false);
     opt.add_opt('d', "degree",   true);
     opt.add_opt('r', "range",    true);
-    opt.add_opt(200, "stats",    false);
-    opt.add_opt(201, "progress", false);
+    opt.add_opt(200, "float",    false);
+    opt.add_opt(201, "double",   false);
+    opt.add_opt(202, "long-double", false);
+    opt.add_opt(203, "stats",    false);
+    opt.add_opt(204, "progress", false);
 
     for (;;)
     {
@@ -109,10 +121,19 @@ int main(int argc, char **argv)
             str_xmin = arg[0];
             str_xmax = arg[1];
           } break;
-        case 200: /* --stats */
+        case 200: /* --float */
+            mode = mode_float;
+            break;
+        case 201: /* --double */
+            mode = mode_double;
+            break;
+        case 202: /* --long-double */
+            mode = mode_long_double;
+            break;
+        case 203: /* --stats */
             show_stats = true;
             break;
-        case 201: /* --progress */
+        case 204: /* --progress */
             show_progress = true;
             break;
         case 'h': /* --help */
@@ -155,7 +176,10 @@ int main(int argc, char **argv)
     if (has_weight)
         solver.set_weight(argv[opt.index + 1]);
 
-    solver.set_decimals(decimals);
+    /* https://en.wikipedia.org/wiki/Floating-point_arithmetic#Internal_representation */
+    int digits = mode == mode_float ? FLT_DIG + 2 :
+                 mode == mode_double ? DBL_DIG + 2 : LDBL_DIG + 2;
+    solver.set_digits(digits);
 
     solver.show_stats = show_stats;
 
@@ -169,39 +193,45 @@ int main(int argc, char **argv)
 
         if (show_progress)
         {
-            print_poly(solver.get_estimate());
+            auto p = solver.get_estimate();
+            for (int j = 0; j < p.degree() + 1; j++)
+            {
+                printf(j > 0 && p[j] >= real::R_0() ? "+" : "");
+                p[j].print(digits);
+                printf(j == 0 ? "" : j > 1 ? "*x**%d" : "*x", j);
+            }
+            printf("\n");
             fflush(stdout);
         }
     }
 
     /* Print final estimate as a C function */
     auto p = solver.get_estimate();
+    char const *type = mode == mode_float ? "float" :
+                       mode == mode_double ? "double" : "long double";
     printf("/* Approximation of f(x) = %s\n", argv[opt.index]);
     if (has_weight)
         printf(" * with weight function g(x) = %s\n", argv[opt.index + 1]);
     printf(" * on interval [ %s, %s ]\n", str_xmin.C(), str_xmax.C());
     printf(" * with a polynomial of degree %d. */\n", p.degree());
-    printf("float f(float x)\n{\n");
+    printf("%s f(%s x)\n{\n", type, type);
     for (int j = p.degree(); j >= 0; --j)
     {
         char const *a = j ? "u = u * x +" : "return u * x +";
-        printf("    %s ", j == p.degree() ? "float u =" : a);
-        p[j].print(20);
-        printf("f;\n");
+        if (j == p.degree())
+            printf("    %s u = ", type);
+        else
+            printf("    %s ", a);
+        p[j].print(digits);
+        switch (mode)
+        {
+            case mode_float: printf("f;\n"); break;
+            case mode_double: printf(";\n"); break;
+            case mode_long_double: printf("l;\n"); break;
+        }
     }
     printf("}\n");
 
     return 0;
-}
-
-static void print_poly(lol::polynomial<lol::real> const &p)
-{
-    for (int j = 0; j < p.degree() + 1; j++)
-    {
-        printf(j > 0 && p[j] >= real::R_0() ? "+" : "");
-        p[j].print(20);
-        printf(j == 0 ? "" : j > 1 ? "*x**%d" : "*x", j);
-    }
-    printf("\n");
 }
 
