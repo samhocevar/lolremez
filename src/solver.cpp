@@ -68,17 +68,13 @@ void remez_solver::set_range(real a, real b)
 
 void remez_solver::set_func(char const *func)
 {
-    m_func_string = func;
     m_func.parse(func);
 }
 
 void remez_solver::set_weight(char const *weight)
 {
     if (weight)
-    {
-        m_weight_string = weight;
         m_weight.parse(weight);
-    }
     m_has_weight = !!weight;
 }
 
@@ -104,6 +100,15 @@ bool remez_solver::do_step()
 
     find_zeros();
     return true;
+}
+
+polynomial<real> remez_solver::get_estimate() const
+{
+    /* Transform our polynomial in the [-1..1] range into a polynomial
+     * in the [a..b] range by composing it with the following polynomial:
+     *  q(x) = 2x / (b-a) - (b+a) / (b-a) */
+    polynomial<real> q ({ -m_k1 / m_k2, real(1) / m_k2 });
+    return m_estimate.eval(q);
 }
 
 /*
@@ -335,49 +340,6 @@ void remez_solver::find_extrema()
         printf(" -:- error: ");
         m_error.print(m_decimals);
         printf("\n");
-    }
-}
-
-void remez_solver::do_print(remez_solver::format fmt)
-{
-    /* Transform our polynomial in the [-1..1] range into a polynomial
-     * in the [a..b] range by composing it with q:
-     *  q(x) = 2x / (b-a) - (b+a) / (b-a) */
-    polynomial<real> q ({ -m_k1 / m_k2, real(1) / m_k2 });
-    polynomial<real> r = m_estimate.eval(q);
-
-    using std::printf;
-
-    switch (fmt)
-    {
-    case remez_solver::format::gnuplot:
-        for (int j = 0; j < m_order + 1; j++)
-        {
-            printf(j > 0 && r[j] >= real::R_0() ? "+" : "");
-            r[j].print(m_decimals);
-            printf(j == 0 ? "" : j > 1 ? "*x**%d" : "*x", j);
-        }
-        printf("\n");
-        break;
-    case remez_solver::format::cpp:
-        printf("/* Approximation of f(x) = %s\n", m_func_string.C());
-        if (m_has_weight)
-            printf(" * with weight function g(x) = %s\n", m_weight_string.C());
-        printf(" * on interval [ ");
-        m_xmin.print(m_decimals);
-        printf(", ");
-        m_xmax.print(m_decimals);
-        printf(" ]\n * with a polynomial of degree %d. */\n", m_order);
-        printf("float f(float x)\n{\n");
-        for (int j = m_order; j >= 0; --j)
-        {
-            char const *a = j ? "u = u * x +" : "return u * x +";
-            printf("    %s ", j == m_order ? "float u =" : a);
-            r[j].print(m_decimals);
-            printf("f;\n");
-        }
-        printf("}\n");
-        break;
     }
 }
 

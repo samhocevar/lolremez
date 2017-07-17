@@ -41,7 +41,8 @@ public:
 
     void do_init();
     bool do_step();
-    void do_print(format fmt);
+
+    lol::polynomial<lol::real> get_estimate() const;
 
     bool show_stats = false;
 
@@ -61,7 +62,6 @@ private:
 
 private:
     /* User-defined parameters */
-    lol::String m_func_string, m_weight_string;
     expression m_func, m_weight;
     lol::real m_xmin = -lol::real::R_1();
     lol::real m_xmax = +lol::real::R_1();

@@ -25,6 +25,8 @@ using lol::array;
 using lol::real;
 using lol::String;
 
+static void print_poly(lol::polynomial<lol::real> const &p);
+
 static void version(void)
 {
     printf("lolremez %s\n", PACKAGE_VERSION);
@@ -70,6 +72,9 @@ static void FAIL(char const *message = nullptr)
 /* See the tutorial at http://lolengine.net/wiki/doc/maths/remez */
 int main(int argc, char **argv)
 {
+    lol::String str_xmin("-1"), str_xmax("1");
+    int decimals = 40;
+    bool has_weight = false;
     bool show_stats = false;
     bool show_progress = false;
 
@@ -101,18 +106,8 @@ int main(int argc, char **argv)
             array<String> arg = String(opt.arg).split(':');
             if (arg.count() != 2)
                 FAIL("invalid range");
-            expression ex;
-            ex.parse(arg[0].C());
-            if (!ex.is_constant())
-                FAIL("invalid range: xmin must be constant");
-            real xmin = ex.eval(real::R_0());
-            ex.parse(arg[1].C());
-            if (!ex.is_constant())
-                FAIL("invalid range: xmax must be constant");
-            real xmax = ex.eval(real::R_0());
-            if (xmin >= xmax)
-                FAIL("invalid range: xmin >= xmax");
-            solver.set_range(xmin, xmax);
+            str_xmin = arg[0];
+            str_xmax = arg[1];
           } break;
         case 200: /* --stats */
             show_stats = true;
@@ -131,28 +126,82 @@ int main(int argc, char **argv)
         }
     }
 
+    /* Initialise solver: ranges */
+    lol::real xmin, xmax;
+    expression ex;
+    ex.parse(str_xmin.C());
+    if (!ex.is_constant())
+        FAIL("invalid range: xmin must be constant");
+    xmin = ex.eval(real::R_0());
+    ex.parse(str_xmax.C());
+    if (!ex.is_constant())
+        FAIL("invalid range: xmax must be constant");
+    xmax = ex.eval(real::R_0());
+    ex.parse(str_xmax.C());
+    if (xmin >= xmax)
+        FAIL("invalid range: xmin >= xmax");
+    solver.set_range(xmin, xmax);
+
+    /* Initialise solver: functions */
     if (opt.index >= argc)
-        FAIL("no function specified");
+        FAIL("too few arguments: no function specified");
 
-    solver.set_func(argv[opt.index++]);
-
-    if (opt.index < argc)
-        solver.set_weight(argv[opt.index++]);
-
-    if (opt.index < argc)
+    if (opt.index + 2 < argc)
         FAIL("too many arguments");
+
+    has_weight = (opt.index + 1 < argc);
+
+    solver.set_func(argv[opt.index]);
+    if (has_weight)
+        solver.set_weight(argv[opt.index + 1]);
+
+    solver.set_decimals(decimals);
 
     solver.show_stats = show_stats;
 
-    for (solver.do_init(); solver.do_step(); )
+    /* Solve polynomial */
+    solver.do_init();
+    for (int iteration = 0; ; ++iteration)
     {
+        fprintf(stderr, "Iteration: %d\r", iteration);
+        if (!solver.do_step())
+            break;
+
         if (show_progress)
-            solver.do_print(remez_solver::format::gnuplot);
-        fflush(stdout);
+        {
+            print_poly(solver.get_estimate());
+            fflush(stdout);
+        }
     }
 
-    solver.do_print(remez_solver::format::cpp);
+    /* Print final estimate as a C function */
+    auto p = solver.get_estimate();
+    printf("/* Approximation of f(x) = %s\n", argv[opt.index]);
+    if (has_weight)
+        printf(" * with weight function g(x) = %s\n", argv[opt.index + 1]);
+    printf(" * on interval [ %s, %s ]\n", str_xmin.C(), str_xmax.C());
+    printf(" * with a polynomial of degree %d. */\n", p.degree());
+    printf("float f(float x)\n{\n");
+    for (int j = p.degree(); j >= 0; --j)
+    {
+        char const *a = j ? "u = u * x +" : "return u * x +";
+        printf("    %s ", j == p.degree() ? "float u =" : a);
+        p[j].print(20);
+        printf("f;\n");
+    }
+    printf("}\n");
 
     return 0;
+}
+
+static void print_poly(lol::polynomial<lol::real> const &p)
+{
+    for (int j = 0; j < p.degree() + 1; j++)
+    {
+        printf(j > 0 && p[j] >= real::R_0() ? "+" : "");
+        p[j].print(20);
+        printf(j == 0 ? "" : j > 1 ? "*x**%d" : "*x", j);
+    }
+    printf("\n");
 }
 
