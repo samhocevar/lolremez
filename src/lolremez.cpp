@@ -91,9 +91,12 @@ int main(int argc, char **argv)
 
         switch (c)
         {
-        case 'd': /* --degree */
-            solver.set_order(atoi(opt.arg));
-            break;
+        case 'd': { /* --degree */
+            int degree = atoi(opt.arg);
+            if (degree < 1)
+                FAIL("invalid degree: must be at least 1");
+            solver.set_order(degree);
+          } break;
         case 'r': { /* --range */
             array<String> arg = String(opt.arg).split(':');
             if (arg.count() != 2)
@@ -105,7 +108,7 @@ int main(int argc, char **argv)
             real xmin = ex.eval(real::R_0());
             ex.parse(arg[1].C());
             if (!ex.is_constant())
-                FAIL("invalid range: xmin must be constant");
+                FAIL("invalid range: xmax must be constant");
             real xmax = ex.eval(real::R_0());
             if (xmin >= xmax)
                 FAIL("invalid range: xmin >= xmax");
