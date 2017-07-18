@@ -99,6 +99,7 @@ int main(int argc, char **argv)
     opt.add_opt(202, "long-double", false);
     opt.add_opt(203, "stats",    false);
     opt.add_opt(204, "progress", false);
+    opt.add_opt(205, "calc",     true);
 
     for (;;)
     {
@@ -136,6 +137,15 @@ int main(int argc, char **argv)
         case 204: /* --progress */
             show_progress = true;
             break;
+        case 205: { /* --calc */
+            expression ex;
+            ex.parse(opt.arg);
+            if (!ex.is_constant())
+                FAIL("invalid range: expression must be constant");
+            ex.eval(real::R_0()).print(40);
+            printf("\n");
+            return EXIT_SUCCESS;
+          } break;
         case 'h': /* --help */
             usage();
             return EXIT_SUCCESS;
