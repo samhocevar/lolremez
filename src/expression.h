@@ -139,16 +139,27 @@ private:
     // r_ <- <blank> *
     struct _ : star<space> {};
 
-    // r_number <- <digit> + ( "." <digit> * ) ? ( [eE] [+-] ? <digit> + ) ?
-    struct r_number : seq<plus<digit>,
-                          opt<seq<one<'.'>,
-                                  star<digit>>>,
-                          opt<seq<one<'e', 'E'>,
-                                  opt<one<'+', '-'>>,
-                                  plus<digit>>>> {};
+    // r_float <- <digit> + ( "." <digit> * ) ? ( ( [eE] [+-] ? <digit> + ) ?
+    struct r_float : seq<plus<digit>,
+                         opt<seq<one<'.'>,
+                                 star<digit>>>,
+                         opt<seq<one<'e', 'E'>,
+                                 opt<one<'+', '-'>>,
+                                 plus<digit>>>> {};
 
-    // r_constant <- r_number / "e" / "pi"
-    struct r_constant : sor<r_number,
+    // r_hex_float <- "0" [xX] <xdigit> + ( "." <xdigit> * ) ? ( ( [pP] [+-] ? <digit> + ) ?
+    struct r_hex_float : seq<one<'0'>,
+                             one<'x', 'X'>,
+                             plus<xdigit>,
+                             opt<seq<one<'.'>,
+                                     star<xdigit>>>,
+                             opt<seq<one<'p', 'P'>,
+                                     opt<one<'+', '-'>>,
+                                     plus<digit>>>> {};
+
+    // r_constant <- r_hex_float / r_float / "e" / "pi"
+    struct r_constant : sor<r_hex_float,
+                            r_float,
                             pegtl_string_t("e"),
                             pegtl_string_t("pi")> {};
 
