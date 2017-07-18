@@ -21,12 +21,12 @@
 //   auto y = e.eval("1.5");
 //
 
-#include "pegtl.hh"
+#include "tao/pegtl.hpp"
 
 namespace grammar
 {
 
-using namespace pegtl;
+using namespace tao::pegtl;
 
 enum class id : uint8_t
 {
@@ -160,17 +160,17 @@ private:
     // r_constant <- r_hex_float / r_float / "e" / "pi"
     struct r_constant : sor<r_hex_float,
                             r_float,
-                            pegtl_string_t("e"),
-                            pegtl_string_t("pi")> {};
+                            TAOCPP_PEGTL_STRING("e"),
+                            TAOCPP_PEGTL_STRING("pi")> {};
 
     // r_var <- "x"
-    struct r_var : pegtl_string_t("x") {};
+    struct r_var : TAOCPP_PEGTL_STRING("x") {};
 
     // r_binary_call <- <r_binary_fun> "(" r_expr "," r_expr ")"
-    struct r_binary_fun : sor<pegtl_string_t("atan2"),
-                              pegtl_string_t("pow"),
-                              pegtl_string_t("min"),
-                              pegtl_string_t("max")> {};
+    struct r_binary_fun : sor<TAOCPP_PEGTL_STRING("atan2"),
+                              TAOCPP_PEGTL_STRING("pow"),
+                              TAOCPP_PEGTL_STRING("min"),
+                              TAOCPP_PEGTL_STRING("max")> {};
 
     struct r_binary_call : seq<r_binary_fun,
                                _, one<'('>,
@@ -180,23 +180,23 @@ private:
                                _, one<')'>> {};
 
     // r_unary_call <- <r_unary_fun> "(" r_expr ")"
-    struct r_unary_fun : sor<pegtl_string_t("abs"),
-                             pegtl_string_t("sqrt"),
-                             pegtl_string_t("cbrt"),
-                             pegtl_string_t("exp"),
-                             pegtl_string_t("exp2"),
-                             pegtl_string_t("log"),
-                             pegtl_string_t("log2"),
-                             pegtl_string_t("log10"),
-                             pegtl_string_t("sin"),
-                             pegtl_string_t("cos"),
-                             pegtl_string_t("tan"),
-                             pegtl_string_t("asin"),
-                             pegtl_string_t("acos"),
-                             pegtl_string_t("atan"),
-                             pegtl_string_t("sinh"),
-                             pegtl_string_t("cosh"),
-                             pegtl_string_t("tanh")> {};
+    struct r_unary_fun : sor<TAOCPP_PEGTL_STRING("abs"),
+                             TAOCPP_PEGTL_STRING("sqrt"),
+                             TAOCPP_PEGTL_STRING("cbrt"),
+                             TAOCPP_PEGTL_STRING("exp"),
+                             TAOCPP_PEGTL_STRING("exp2"),
+                             TAOCPP_PEGTL_STRING("log"),
+                             TAOCPP_PEGTL_STRING("log2"),
+                             TAOCPP_PEGTL_STRING("log10"),
+                             TAOCPP_PEGTL_STRING("sin"),
+                             TAOCPP_PEGTL_STRING("cos"),
+                             TAOCPP_PEGTL_STRING("tan"),
+                             TAOCPP_PEGTL_STRING("asin"),
+                             TAOCPP_PEGTL_STRING("acos"),
+                             TAOCPP_PEGTL_STRING("atan"),
+                             TAOCPP_PEGTL_STRING("sinh"),
+                             TAOCPP_PEGTL_STRING("cosh"),
+                             TAOCPP_PEGTL_STRING("tanh")> {};
 
     struct r_unary_call : seq<r_unary_fun,
                               _, one<'('>,
@@ -251,7 +251,7 @@ private:
                         star<sor<r_add, r_sub>>> {};
 
     // r_stmt <- r_expr <end>
-    struct r_stmt : must<pad<r_expr, space>, pegtl::eof> {};
+    struct r_stmt : must<pad<r_expr, space>, tao::pegtl::eof> {};
 
     //
     // Default actions
@@ -263,7 +263,8 @@ private:
     template<id OP>
     struct generic_action
     {
-        static void apply(action_input const &in, expression *that)
+        template<typename INPUT>
+        static void apply(INPUT const &in, expression *that)
         {
             UNUSED(in);
             that->m_ops.push(OP, -1);
@@ -279,7 +280,8 @@ public:
         m_ops.empty();
         m_constants.empty();
 
-        pegtl::parse_string<r_stmt, action>(str, "expression", this);
+        tao::pegtl::memory_input<> in(str, "expression");
+        tao::pegtl::parse<r_stmt, action>(in, this);
     }
 };
 
@@ -302,7 +304,8 @@ template<> struct expression::action<expression::r_minus> : generic_action<id::m
 template<>
 struct expression::action<expression::r_binary_call>
 {
-    static void apply(action_input const &in, expression *that)
+    template<typename INPUT>
+    static void apply(INPUT const &in, expression *that)
     {
         struct { id ret; char const *name; } lut[] =
         {
@@ -326,7 +329,8 @@ struct expression::action<expression::r_binary_call>
 template<>
 struct expression::action<expression::r_unary_call>
 {
-    static void apply(action_input const &in, expression *that)
+    template<typename INPUT>
+    static void apply(INPUT const &in, expression *that)
     {
         struct { id ret; char const *name; } lut[] =
         {
@@ -363,7 +367,8 @@ struct expression::action<expression::r_unary_call>
 template<>
 struct expression::action<expression::r_constant>
 {
-    static void apply(action_input const &in, expression *that)
+    template<typename INPUT>
+    static void apply(INPUT const &in, expression *that)
     {
         that->m_ops.push(id::constant, that->m_constants.count());
         if (in.string() == "e")
