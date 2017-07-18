@@ -220,26 +220,33 @@ private:
 
     // r_signed <- "-" r_signed / "+" r_signed / r_terminal
     struct r_signed;
-    struct r_minus : seq<one<'-'>, _, r_signed> {};
-    struct r_signed : sor<r_minus,
+    struct r_negative : seq<one<'-'>, _, r_signed> {};
+    struct r_signed : sor<r_negative,
                           seq<one<'+'>, _, r_signed>,
                           r_terminal> {};
 
-    // r_exponent <- ( "^" / "**" ) r_signed
-    struct r_exponent : seq<pad<sor<one<'^'>,
-                                    string<'*', '*'>>, space>,
-                            r_signed> {};
+    // r_pow <- ( "^" / "**" ) r_signed
+    struct r_pow : seq<pad<sor<one<'^'>,
+                               string<'*', '*'>>, space>,
+                       r_signed> {};
 
-    // r_factor <- r_signed ( r_exponent ) *
-    struct r_factor : seq<r_signed,
-                          star<r_exponent>> {};
+    // r_factor <- r_terminal ( r_pow ) *
+    struct r_factor : seq<r_terminal,
+                          star<r_pow>> {};
 
-    // r_mul <- "*" r_factor
-    // r_div <- "/" r_factor
-    // r_term <- r_factor ( r_mul / r_div ) *
-    struct r_mul : seq<_, one<'*'>, _, r_factor> {};
-    struct r_div : seq<_, one<'/'>, _, r_factor> {};
-    struct r_term : seq<r_factor,
+    // r_signed2 <- "-" r_signed2 / "+" r_signed2 / r_factor
+    struct r_signed2;
+    struct r_negative2 : seq<one<'-'>, _, r_signed2> {};
+    struct r_signed2 : sor<r_negative2,
+                           seq<one<'+'>, _, r_signed2>,
+                           r_factor> {};
+
+    // r_mul <- "*" r_signed2
+    // r_div <- "/" r_signed2
+    // r_term <- r_signed2 ( r_mul / r_div ) *
+    struct r_mul : seq<_, one<'*'>, _, r_signed2> {};
+    struct r_div : seq<_, one<'/'>, _, r_signed2> {};
+    struct r_term : seq<r_signed2,
                         star<sor<r_mul, r_div>>> {};
 
     // r_add <- "+" r_term
@@ -290,12 +297,13 @@ public:
 //
 
 template<> struct expression::action<expression::r_var> : generic_action<id::x> {};
-template<> struct expression::action<expression::r_exponent> : generic_action<id::pow> {};
+template<> struct expression::action<expression::r_pow> : generic_action<id::pow> {};
 template<> struct expression::action<expression::r_mul> : generic_action<id::mul> {};
 template<> struct expression::action<expression::r_div> : generic_action<id::div> {};
 template<> struct expression::action<expression::r_add> : generic_action<id::add> {};
 template<> struct expression::action<expression::r_sub> : generic_action<id::sub> {};
-template<> struct expression::action<expression::r_minus> : generic_action<id::minus> {};
+template<> struct expression::action<expression::r_negative> : generic_action<id::minus> {};
+template<> struct expression::action<expression::r_negative2> : generic_action<id::minus> {};
 
 //
 // Rule specialisations for unary and binary function calls
