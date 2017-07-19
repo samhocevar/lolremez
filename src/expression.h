@@ -289,10 +289,8 @@ private:
     template<id OP>
     struct generic_action
     {
-        template<typename INPUT>
-        static void apply(INPUT const &in, expression *that)
+        static void apply0(expression *that)
         {
-            UNUSED(in);
             that->m_ops.push(OP, -1);
         }
     };
