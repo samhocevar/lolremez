@@ -41,6 +41,12 @@ Exponent shortcuts:
 
  - *x²*, *x³*…
 
+Constants:
+
+ - *e*,
+ - *pi*, *π*
+ - *tau*, *τ* (Tau is [great for trolling](https://tauday.com/tau-manifesto))
+
 Math functions:
 
  - *abs()* (absolute value)

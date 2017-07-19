@@ -172,11 +172,14 @@ private:
     // r_sup_float <- <r_sup_digit> +
     struct r_sup_float : plus<r_sup_digit> {};
 
-    // r_constant <- r_hex_float / r_float / "e" / "pi"
+    // r_constant <- r_hex_float / r_float / "e" / "pi" / "π" / "tau" / "τ"
     struct r_constant : sor<r_hex_float,
                             r_float,
                             TAOCPP_PEGTL_STRING("e"),
-                            TAOCPP_PEGTL_STRING("pi")> {};
+                            TAOCPP_PEGTL_STRING("pi"),
+                            TAOCPP_PEGTL_STRING("π"),
+                            TAOCPP_PEGTL_STRING("tau"),
+                            TAOCPP_PEGTL_STRING("τ")> {};
 
     // r_var <- "x"
     struct r_var : TAOCPP_PEGTL_STRING("x") {};
@@ -431,8 +434,10 @@ struct expression::action<expression::r_constant>
         that->m_ops.push(id::constant, that->m_constants.count());
         if (in.string() == "e")
             that->m_constants.push(lol::real::R_E());
-        else if (in.string() == "pi")
+        else if (in.string() == "pi" || in.string() == "π")
             that->m_constants.push(lol::real::R_PI());
+        else if (in.string() == "tau" || in.string() == "τ")
+            that->m_constants.push(lol::real::R_TAU());
         else /* FIXME: check if the constant is already in the list */
             that->m_constants.push(lol::real(in.string().c_str()));
     }
