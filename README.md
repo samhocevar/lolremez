@@ -1,31 +1,31 @@
 # LolRemez
 
-A Remez algorithm toolkit to approximate functions using polynomials.
+A Remez algorithm implementation to approximate functions using polynomials.
 
 A tutorial is available [in the wiki section](https://github.com/samhocevar/lolremez/wiki).
 
 ## Example
 
-Approximate `atan(sqrt(3+x)-exp(1+x))` over the range `[-1,1]` with a 5th degree polynomial:
+Approximate `atan(sqrt(3+x³)-exp(1+x))` over the range `[sqrt(2),pi²]` with a 5th degree polynomial:
 
 ```sh
-lolremez -d 5 -r -1:1 "atan(sqrt(3+x)-exp(1+x))"
+lolremez -d 5 -r "sqrt(2):pi²" "atan(sqrt(3+x³)-exp(1+x))"
 ```
 
 Result:
 
 ```c++
-/* Approximation of f(x) = atan(sqrt(3+x)-exp(1+x))
- * on interval [ -1.0000000000000000000, 1.0000000000000000000 ]
+/* Approximation of f(x) = atan(sqrt(3+x³)-exp(1+x))
+ * on interval [ sqrt(2), pi² ]
  * with a polynomial of degree 5. */
-float f(float x)
+double f(double x)
 {
-    float u = -1.1514600677101831554e-1f;
-    u = u * x + -3.1404157365765952659e-1f;
-    u = u * x + 4.7315508009637667259e-1f;
-    u = u * x + 5.7678822318891844828e-1f;
-    u = u * x + -1.2480195820255797595f;
-    return u * x + -7.6941172112944451609e-1f;
+    double u = -3.9557569330471554e-5;
+    u = u * x + 1.2947712130833294e-3;
+    u = u * x + -1.6541397035559147e-2;
+    u = u * x + 1.0351664953941214e-1;
+    u = u * x + -3.2051562487328135e-1;
+    return u * x + -1.1703528319321960;
 }
 ```
 
@@ -36,6 +36,10 @@ Binary functions/operators:
  - \+ \- \* /
  - *atan2(y, x)*, *pow(x, y)*
  - *min(x, y)*, *max(x, y)*
+
+Exponent shortcuts:
+
+ - *x²*, *x³*…
 
 Math functions:
 
