@@ -157,6 +157,21 @@ private:
                                      opt<one<'+', '-'>>,
                                      plus<digit>>>> {};
 
+    // r_sup_digit <- "⁰" / "¹" / "²" / "³" / "⁴" / "⁵" / "⁶" / "⁷" / "⁸" / "⁹"
+    struct r_sup_digit : sor<TAOCPP_PEGTL_STRING("⁰"),
+                             TAOCPP_PEGTL_STRING("¹"),
+                             TAOCPP_PEGTL_STRING("²"),
+                             TAOCPP_PEGTL_STRING("³"),
+                             TAOCPP_PEGTL_STRING("⁴"),
+                             TAOCPP_PEGTL_STRING("⁵"),
+                             TAOCPP_PEGTL_STRING("⁶"),
+                             TAOCPP_PEGTL_STRING("⁷"),
+                             TAOCPP_PEGTL_STRING("⁸"),
+                             TAOCPP_PEGTL_STRING("⁹")> {};
+
+    // r_sup_float <- <r_sup_digit> +
+    struct r_sup_float : plus<r_sup_digit> {};
+
     // r_constant <- r_hex_float / r_float / "e" / "pi"
     struct r_constant : sor<r_hex_float,
                             r_float,
@@ -212,11 +227,12 @@ private:
                                pad<r_expr, space>,
                                one<')'>> {};
 
-    // r_terminal <- r_call / r_var / r_constant / r_parentheses
-    struct r_terminal : sor<r_call,
-                            r_var,
-                            r_constant,
-                            r_parentheses> {};
+    // r_terminal <- ( r_call / r_var / r_constant / r_parentheses ) r_sup_float ?
+    struct r_terminal : seq<sor<r_call,
+                                r_var,
+                                r_constant,
+                                r_parentheses>,
+                            _, opt<r_sup_float>> {};
 
     // r_signed <- "-" r_signed / "+" r_signed / r_terminal
     struct r_signed;
@@ -369,6 +385,40 @@ struct expression::action<expression::r_unary_call>
             that->m_ops.push(pair.ret, -1);
             return;
         }
+    }
+};
+
+template<>
+struct expression::action<expression::r_sup_float>
+{
+    template<typename INPUT>
+    static void apply(INPUT const &in, expression *that)
+    {
+        lol::real val = lol::real::R_0();
+
+        for (char const *p = in.string().c_str(); *p; )
+        {
+            val *= lol::real::R_10();
+
+            static char const *lut[] =
+            {
+                "⁰", "¹", "²", "³", "⁴", "⁵", "⁶", "⁷", "⁸", "⁹",
+            };
+
+            for (int i = 0; i < 10; ++i)
+            {
+                if (memcmp(p, lut[i], strlen(lut[i])) == 0)
+                {
+                    val += lol::real(i);
+                    p += strlen(lut[i]);
+                    break;
+                }
+            }
+        }
+
+        that->m_ops.push(id::constant, that->m_constants.count());
+        that->m_constants.push(val);
+        that->m_ops.push(id::pow, -1);
     }
 };
 
