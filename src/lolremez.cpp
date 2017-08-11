@@ -198,6 +198,7 @@ int main(int argc, char **argv)
     for (int iteration = 0; ; ++iteration)
     {
         fprintf(stderr, "Iteration: %d\r", iteration);
+        fflush(stderr); /* Required on Windows because stderr is buffered. */
         if (!solver.do_step())
             break;
 
