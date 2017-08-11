@@ -58,6 +58,7 @@ static void usage()
     printf("  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\"\n");
     printf("  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\" \"exp(1+x)\"\n");
     printf("\n");
+    printf("Tutorial available on https://github.com/samhocevar/lolremez/wiki\n");
     printf("Written by Sam Hocevar. Report bugs to <sam@hocevar.net>.\n");
 }
 
