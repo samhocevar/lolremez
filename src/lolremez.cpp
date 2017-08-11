@@ -61,10 +61,17 @@ static void usage()
     printf("Written by Sam Hocevar. Report bugs to <sam@hocevar.net>.\n");
 }
 
-static void FAIL(char const *message = nullptr)
+static void FAIL(char const *message = nullptr, ...)
 {
     if (message)
-        printf("Error: %s\n", message);
+    {
+        printf("Error: ");
+        va_list ap;
+        va_start(ap, message);
+        vfprintf(stdout, message, ap);
+        va_end(ap);
+        printf("\n");
+    }
     printf("Try 'lolremez --help' for more information.\n");
     exit(EXIT_FAILURE);
 }
@@ -139,7 +146,8 @@ int main(int argc, char **argv)
             break;
         case 205: { /* --calc */
             expression ex;
-            ex.parse(opt.arg);
+            if (!ex.parse(opt.arg))
+                FAIL("invalid range syntax: %s", opt.arg);
             if (!ex.is_constant())
                 FAIL("invalid range: expression must be constant");
             ex.eval(real::R_0()).print(40);
@@ -160,15 +168,19 @@ int main(int argc, char **argv)
     /* Initialise solver: ranges */
     lol::real xmin, xmax;
     expression ex;
-    ex.parse(str_xmin.C());
+
+    if (!ex.parse(str_xmin.C()))
+        FAIL("invalid range xmin syntax: %s", str_xmin.C());
     if (!ex.is_constant())
         FAIL("invalid range: xmin must be constant");
     xmin = ex.eval(real::R_0());
-    ex.parse(str_xmax.C());
+
+    if (!ex.parse(str_xmax.C()))
+        FAIL("invalid range xmax syntax: %s", str_xmax.C());
     if (!ex.is_constant())
         FAIL("invalid range: xmax must be constant");
     xmax = ex.eval(real::R_0());
-    ex.parse(str_xmax.C());
+
     if (xmin >= xmax)
         FAIL("invalid range: xmin >= xmax");
     solver.set_range(xmin, xmax);
@@ -182,9 +194,11 @@ int main(int argc, char **argv)
 
     has_weight = (opt.index + 1 < argc);
 
-    solver.set_func(argv[opt.index]);
-    if (has_weight)
-        solver.set_weight(argv[opt.index + 1]);
+    if (!solver.set_func(argv[opt.index]))
+        FAIL("invalid function: %s", argv[opt.index]);
+
+    if (has_weight && !solver.set_weight(argv[opt.index + 1]))
+        FAIL("invalid weight function: %s", argv[opt.index + 1]);
 
     /* https://en.wikipedia.org/wiki/Floating-point_arithmetic#Internal_representation */
     int digits = mode == mode_float ? FLT_DIG + 2 :

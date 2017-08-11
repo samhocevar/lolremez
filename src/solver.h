@@ -36,8 +36,8 @@ public:
     void set_order(int order);
     void set_digits(int digits);
     void set_range(lol::real xmin, lol::real xmax);
-    void set_func(char const *func);
-    void set_weight(char const *weight);
+    bool set_func(char const *func);
+    bool set_weight(char const *weight);
 
     void do_init();
     bool do_step();

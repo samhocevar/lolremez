@@ -66,16 +66,15 @@ void remez_solver::set_range(real a, real b)
     m_xmax = b;
 }
 
-void remez_solver::set_func(char const *func)
+bool remez_solver::set_func(char const *func)
 {
-    m_func.parse(func);
+    return m_func.parse(func);
 }
 
-void remez_solver::set_weight(char const *weight)
+bool remez_solver::set_weight(char const *weight)
 {
-    if (weight)
-        m_weight.parse(weight);
     m_has_weight = !!weight;
+    return weight ? m_weight.parse(weight) : true;
 }
 
 void remez_solver::do_init()
