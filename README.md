@@ -6,10 +6,10 @@ A tutorial is available [in the wiki section](https://github.com/samhocevar/lolr
 
 ## Example
 
-Approximate `atan(sqrt(3+x³)-exp(1+x))` over the range `[sqrt(2),pi²]` with a 5th degree polynomial:
+Approximate `atan(sqrt(3+x³)-exp(1+x))` over the range `[sqrt(2),pi²]` with a 5th degree polynomial for `double` floats:
 
 ```sh
-lolremez -d 5 -r "sqrt(2):pi²" "atan(sqrt(3+x³)-exp(1+x))"
+lolremez --double -d 5 -r "sqrt(2):pi²" "atan(sqrt(3+x³)-exp(1+x))"
 ```
 
 Result:
@@ -20,12 +20,12 @@ Result:
  * with a polynomial of degree 5. */
 double f(double x)
 {
-    double u = -3.9557569330471554e-5;
+    double u = -3.9557569330471555e-5;
     u = u * x + 1.2947712130833294e-3;
     u = u * x + -1.6541397035559147e-2;
     u = u * x + 1.0351664953941214e-1;
     u = u * x + -3.2051562487328135e-1;
-    return u * x + -1.1703528319321960;
+    return u * x + -1.1703528319321961;
 }
 ```
 
@@ -56,7 +56,21 @@ Math functions:
  - *asin()*, *acos()*, *atan()*
  - *sinh()*, *cosh()*, *tanh()*
 
+Parsing rules:
+
+ - *-a^b* is *-(a^b)*
+ - *a^b^c* is *(a^b)^c*
+
 ## Changes
+
+### News for LolRemez 0.4:
+
+ - Allow expressions in the range specification: `-r -pi/4:pi/4` is now valid.
+ - Allow using “pi” and “e” in expressions, as well as “π”.
+ - Bugfixes in the expression parser.
+ - Support for hexadecimal floats, *e.g.* `0x1.999999999999999ap-4`.
+ - New `--float`, `--double` and `--long-double` options to choose precision.
+ - Trim down DLL dependencies to allow for lighter binaries.
 
 ### News for LolRemez 0.3:
 
