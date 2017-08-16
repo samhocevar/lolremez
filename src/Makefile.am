@@ -1,7 +1,8 @@
 
 include $(top_srcdir)/lol/build/autotools/common.am
 
-EXTRA_DIST += lolremez.vcxproj lolremez.vcxproj.filters
+EXTRA_DIST += .gitignore \
+              lolremez.vcxproj lolremez.vcxproj.filters
 
 bin_PROGRAMS = lolremez
 
