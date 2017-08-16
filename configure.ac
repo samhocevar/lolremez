@@ -11,7 +11,7 @@ dnl
 AC_PREREQ(2.50)
 AC_CONFIG_AUX_DIR(.auto)
 AC_CANONICAL_SYSTEM
-AM_INIT_AUTOMAKE([subdir-objects no-define tar-ustar silent-rules])
+AM_INIT_AUTOMAKE([subdir-objects no-define tar-ustar silent-rules dist-xz])
 AM_DEFAULT_VERBOSITY=0
 
 AC_PROG_CXX
