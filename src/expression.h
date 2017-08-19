@@ -31,7 +31,7 @@ using namespace tao::pegtl;
 enum class id : uint8_t
 {
     /* Variables and constants */
-    x,
+    x, y,
     constant,
     /* Unary functions/operators */
     plus, minus, abs,
@@ -62,6 +62,11 @@ struct expression
             if (m_ops[i].m1 == id::x)
             {
                 stack.push(x);
+                continue;
+            }
+            else if (m_ops[i].m1 == id::y)
+            {
+                stack.push(0); // TODO
                 continue;
             }
             else if (m_ops[i].m1 == id::constant)
@@ -107,6 +112,7 @@ struct expression
             case id::max:   stack.push(max(stack.pop(), head));   break;
 
             case id::x:
+            case id::y:
             case id::constant:
                 /* Already handled above */
                 break;
@@ -172,17 +178,16 @@ private:
     // r_sup_float <- <r_sup_digit> +
     struct r_sup_float : plus<r_sup_digit> {};
 
-    // r_constant <- r_hex_float / r_float / "e" / "pi" / "π" / "tau" / "τ"
-    struct r_constant : sor<r_hex_float,
-                            r_float,
-                            TAOCPP_PEGTL_STRING("e"),
-                            TAOCPP_PEGTL_STRING("pi"),
-                            TAOCPP_PEGTL_STRING("π"),
-                            TAOCPP_PEGTL_STRING("tau"),
-                            TAOCPP_PEGTL_STRING("τ")> {};
-
-    // r_var <- "x"
-    struct r_var : TAOCPP_PEGTL_STRING("x") {};
+    // r_name <- r_hex_float / r_float / "x" / "y" / "e" / "pi" / "π" / "tau" / "τ"
+    struct r_name : sor<r_hex_float,
+                        r_float,
+                        TAOCPP_PEGTL_STRING("x"),
+                        TAOCPP_PEGTL_STRING("y"),
+                        TAOCPP_PEGTL_STRING("e"),
+                        TAOCPP_PEGTL_STRING("pi"),
+                        TAOCPP_PEGTL_STRING("π"),
+                        TAOCPP_PEGTL_STRING("tau"),
+                        TAOCPP_PEGTL_STRING("τ")> {};
 
     // r_binary_call <- <r_binary_fun> "(" r_expr "," r_expr ")"
     struct r_binary_fun : sor<TAOCPP_PEGTL_STRING("atan2"),
@@ -230,10 +235,9 @@ private:
                                pad<r_expr, space>,
                                one<')'>> {};
 
-    // r_terminal <- ( r_call / r_var / r_constant / r_parentheses ) r_sup_float ?
+    // r_terminal <- ( r_call / r_name / r_parentheses ) r_sup_float ?
     struct r_terminal : seq<sor<r_call,
-                                r_var,
-                                r_constant,
+                                r_name,
                                 r_parentheses>,
                             _, opt<r_sup_float>> {};
 
@@ -322,7 +326,6 @@ public:
 // Rule specialisations for simple operators
 //
 
-template<> struct expression::action<expression::r_var> : generic_action<id::x> {};
 template<> struct expression::action<expression::r_pow> : generic_action<id::pow> {};
 template<> struct expression::action<expression::r_mul> : generic_action<id::mul> {};
 template<> struct expression::action<expression::r_div> : generic_action<id::div> {};
@@ -433,20 +436,27 @@ struct expression::action<expression::r_sup_float>
 };
 
 template<>
-struct expression::action<expression::r_constant>
+struct expression::action<expression::r_name>
 {
     template<typename INPUT>
     static void apply(INPUT const &in, expression *that)
     {
-        that->m_ops.push(id::constant, that->m_constants.count());
-        if (in.string() == "e")
-            that->m_constants.push(lol::real::R_E());
-        else if (in.string() == "pi" || in.string() == "π")
-            that->m_constants.push(lol::real::R_PI());
-        else if (in.string() == "tau" || in.string() == "τ")
-            that->m_constants.push(lol::real::R_TAU());
-        else /* FIXME: check if the constant is already in the list */
-            that->m_constants.push(lol::real(in.string().c_str()));
+        if (in.string() == "x")
+            that->m_ops.push(id::x, -1);
+        else if (in.string() == "y")
+            that->m_ops.push(id::y, -1);
+        else
+        {
+            that->m_ops.push(id::constant, that->m_constants.count());
+            if (in.string() == "e")
+                that->m_constants.push(lol::real::R_E());
+            else if (in.string() == "pi" || in.string() == "π")
+                that->m_constants.push(lol::real::R_PI());
+            else if (in.string() == "tau" || in.string() == "τ")
+                that->m_constants.push(lol::real::R_TAU());
+            else /* FIXME: check if the constant is already in the list */
+                that->m_constants.push(lol::real(in.string().c_str()));
+        }
     }
 };
 
