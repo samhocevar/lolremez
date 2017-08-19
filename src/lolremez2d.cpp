@@ -20,11 +20,6 @@
 
 using namespace lol;
 
-real cheb(int i, int n)
-{
-    return -cos(real::R_PI() * i / n) * real("0.999999999999999");
-}
-
 real f(real const &x, real const &y)
 {
     static array<real,real,real> cache;
@@ -38,77 +33,95 @@ real f(real const &x, real const &y)
     real f = (x + one) / 2;
     real d = (y + one) / 2;
     real ret = sin((one - f) * acos(d)) / sqrt(one - d * d);
+
     cache.push(x, y, ret);
     return ret;
 }
 
-real x_1, y_1;
-real x_2, y_2;
-real x_3, y_3;
-real x_4, y_4;
-real x_5, y_5;
-real x_6, y_6;
+struct solver
+{
+    solver(int grid)
+      : m_grid(grid)
+    {
+        for (int i = 0; i <= grid; ++i)
+            m_coeff.push(cheb(i, grid));
+    }
 
-real e0(real const &x, real const &y) { return f(x,y); }
-real f0(real const &x, real const &y) { return real::R_0(); }
+    void step()
+    {
+        rvec2 best(0);
+        real max_abs = real::R_0();
 
-real d1(real const &x, real const &y) { return e0(x,y_1) * e0(x_1,y) / e0(x_1,y_1); }
-real e1(real const &x, real const &y) { return e0(x,y) - d1(x,y); }
-real f1(real const &x, real const &y) { return f0(x,y) + d1(x,y); }
+        for (auto const &y : m_coeff)
+        for (auto const &x : m_coeff)
+        {
+            real ret = abs(e_n(m_pivots.count(), x, y));
+            if (ret > max_abs)
+            {
+                best = rvec2(x,y);
+                max_abs = ret;
+            }
+        }
+        m_pivots.push(rvec3(best, real::R_1() / e_n(m_pivots.count(), best.x, best.y)));
+    }
 
-real d2(real const &x, real const &y) { return e1(x,y_2) * e1(x_2,y) / e1(x_2,y_2); }
-real e2(real const &x, real const &y) { return e1(x,y) - d2(x,y); }
-real f2(real const &x, real const &y) { return f1(x,y) + d2(x,y); }
+    void dump_gnuplot()
+    {
+        printf("f(x,y)=sin((1-x)/2*acos((1+y)/2))/sqrt(1-((y+1)/2)**2)\n");
+        printf("e0(x,y)=f(x,y)\n");
+        //printf("f0(x,y)=0\n");
 
-real d3(real const &x, real const &y) { return e2(x,y_3) * e2(x_3,y) / e2(x_3,y_3); }
-real e3(real const &x, real const &y) { return e2(x,y) - d3(x,y); }
-real f3(real const &x, real const &y) { return f2(x,y) + d3(x,y); }
+        for (int n = 0; n < m_pivots.count(); ++n)
+        {
+            printf("x%d=", n+1); m_pivots[n].x.print(20); printf("\n");
+            printf("y%d=", n+1); m_pivots[n].y.print(20); printf("\n");
+            printf("d%d=e%d(x%d,y%d)\n", n+1, n, n+1, n+1);
+            printf("e%d(x,y)=e%d(x,y)-e%d(x%d,y)*e%d(x,y%d)/d%d\n", n+1, n, n, n+1, n, n+1, n+1);
+            //printf("f%d(x,y)=f%d(x,y)+e%d(x%d,y)*e%d(x,y%d)/d%d\n", n+1, n, n, n+1, n, n+1, n+1);
+        }
 
-real d4(real const &x, real const &y) { return e3(x,y_4) * e3(x_4,y) / e3(x_4,y_4); }
-real e4(real const &x, real const &y) { return e3(x,y) - d4(x,y); }
-real f4(real const &x, real const &y) { return f3(x,y) + d4(x,y); }
+        printf("splot [-1:1][-1:1] e%d(x,y)\n", m_pivots.count());
+    }
 
-real d5(real const &x, real const &y) { return e4(x,y_5) * e4(x_5,y) / e4(x_5,y_5); }
-real e5(real const &x, real const &y) { return e4(x,y) - d5(x,y); }
-real f5(real const &x, real const &y) { return f4(x,y) + d5(x,y); }
+private:
+    real d_n(int i, real const &x, real const &y)
+    {
+        return e_n(i, x, m_pivots[i].y) * e_n(i, m_pivots[i].x, y) * m_pivots[i].z;
+    }
+
+    real e_n(int i, real const &x, real const &y)
+    {
+        return i == 0 ? f(x, y) : e_n(i - 1, x, y) - d_n(i - 1, x, y);
+    }
+
+    real f_n(int i, real const &x, real const &y)
+    {
+        return i == 0 ? real::R_0() : f_n(i - 1, x, y) + d_n(i - 1, x, y);
+    }
+
+    real cheb(int i, int n)
+    {
+        return -cos(real::R_PI() * i / n) * real("0.999999999999999");
+    }
+
+    int m_grid;
+    array<real> m_coeff;
+    array<rvec3> m_pivots;
+};
 
 int main(int argc, char **argv)
 {
     UNUSED(argc, argv);
 
-    int const grid = 33;
+    int const iters = 6;
 
-    array<real> coeff;
-    for (int i = 0; i <= grid; ++i)
-        coeff.push(cheb(i, grid));
-    real max_abs;
+    /* Create solver and iterate */
+    solver s(33);
+    for (int n = 0; n < iters; ++n)
+        s.step();
 
-    printf("e0(x,y)=f(x,y)\n");
-    printf("f0(x,y)=0\n");
-
-#define DO(n0,n1) \
-    max_abs = real::R_0(); \
-    for (auto const &y : coeff) \
-    for (auto const &x : coeff) \
-    { \
-        real ret = abs(e##n0(x, y)); \
-        if (ret > max_abs) { x_##n1 = x; y_##n1 = y; max_abs = ret; } \
-    } \
-    printf("x%d=", n1); x_##n1.print(20); printf("\n"); \
-    printf("y%d=", n1); y_##n1.print(20); printf("\n"); \
-    printf("tmp="); max_abs.print(20); printf("\n"); \
-    printf("d"#n1"=e"#n0"(x"#n1",y"#n1")\n"); \
-    printf("e"#n1"(x,y)=e"#n0"(x,y)-e"#n0"(x"#n1",y)*e"#n0"(x,y"#n1")/d"#n1"\n"); \
-    printf("f"#n1"(x,y)=f"#n0"(x,y)+e"#n0"(x"#n1",y)*e"#n0"(x,y"#n1")/d"#n1"\n");
-
-    DO(0,1);
-    DO(1,2);
-    DO(2,3);
-    DO(3,4);
-    DO(4,5);
-    DO(5,6);
-
-    printf("splot e6(x,y)\n");
+    /* Dump gnuplot data about the solver */
+    s.dump_gnuplot();
 
     return EXIT_SUCCESS;
 }
