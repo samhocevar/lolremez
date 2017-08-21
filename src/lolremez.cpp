@@ -25,7 +25,6 @@
 
 using lol::array;
 using lol::real;
-using lol::String;
 
 static void version(void)
 {
@@ -80,7 +79,7 @@ static void FAIL(char const *message = nullptr, ...)
 /* See the tutorial at http://lolengine.net/wiki/doc/maths/remez */
 int main(int argc, char **argv)
 {
-    lol::String str_xmin("-1"), str_xmax("1");
+    std::string str_xmin("-1"), str_xmax("1");
     enum
     {
         mode_float,
@@ -124,7 +123,7 @@ int main(int argc, char **argv)
             solver.set_order(degree);
           } break;
         case 'r': { /* --range */
-            array<String> arg = String(opt.arg).split(':');
+            auto arg = lol::split(opt.arg, ':');
             if (arg.count() != 2)
                 FAIL("invalid range");
             str_xmin = arg[0];
@@ -170,14 +169,14 @@ int main(int argc, char **argv)
     lol::real xmin, xmax;
     expression ex;
 
-    if (!ex.parse(str_xmin.C()))
-        FAIL("invalid range xmin syntax: %s", str_xmin.C());
+    if (!ex.parse(str_xmin.c_str()))
+        FAIL("invalid range xmin syntax: %s", str_xmin.c_str());
     if (!ex.is_constant())
         FAIL("invalid range: xmin must be constant");
     xmin = ex.eval(real::R_0());
 
-    if (!ex.parse(str_xmax.C()))
-        FAIL("invalid range xmax syntax: %s", str_xmax.C());
+    if (!ex.parse(str_xmax.c_str()))
+        FAIL("invalid range xmax syntax: %s", str_xmax.c_str());
     if (!ex.is_constant())
         FAIL("invalid range: xmax must be constant");
     xmax = ex.eval(real::R_0());
@@ -238,7 +237,7 @@ int main(int argc, char **argv)
     printf("/* Approximation of f(x) = %s\n", argv[opt.index]);
     if (has_weight)
         printf(" * with weight function g(x) = %s\n", argv[opt.index + 1]);
-    printf(" * on interval [ %s, %s ]\n", str_xmin.C(), str_xmax.C());
+    printf(" * on interval [ %s, %s ]\n", str_xmin.c_str(), str_xmax.c_str());
     printf(" * with a polynomial of degree %d. */\n", p.degree());
     printf("%s f(%s x)\n{\n", type, type);
     for (int j = p.degree(); j >= 0; --j)
