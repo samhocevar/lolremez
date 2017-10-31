@@ -36,7 +36,7 @@ enum class id : uint8_t
     /* Unary functions/operators */
     plus, minus, abs,
     sqrt, cbrt,
-    exp, exp2, log, log2, log10,
+    exp, exp2, erf, log, log2, log10,
     sin, cos, tan,
     asin, acos, atan,
     sinh, cosh, tanh,
@@ -83,6 +83,7 @@ struct expression
             case id::cbrt:  stack.push(cbrt(head));  break;
             case id::exp:   stack.push(exp(head));   break;
             case id::exp2:  stack.push(exp2(head));  break;
+            case id::erf:   stack.push(erf(head));   break;
             case id::log:   stack.push(log(head));   break;
             case id::log2:  stack.push(log2(head));  break;
             case id::log10: stack.push(log10(head)); break;
@@ -203,6 +204,7 @@ private:
                              TAOCPP_PEGTL_STRING("cbrt"),
                              TAOCPP_PEGTL_STRING("exp"),
                              TAOCPP_PEGTL_STRING("exp2"),
+                             TAOCPP_PEGTL_STRING("erf"),
                              TAOCPP_PEGTL_STRING("log"),
                              TAOCPP_PEGTL_STRING("log2"),
                              TAOCPP_PEGTL_STRING("log10"),
@@ -373,6 +375,7 @@ struct expression::action<expression::r_unary_call>
             { id::cbrt,  "cbrt" },
             { id::exp,   "exp" },
             { id::exp2,  "exp2" },
+            { id::erf,   "erf" },
             { id::log10, "log10" },
             { id::log2,  "log2" },
             { id::log,   "log" },
