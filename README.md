@@ -51,7 +51,7 @@ Math functions:
 
  - *abs()* (absolute value)
  - *sqrt()* (square root), *cbrt()* (cubic root)
- - *exp()*, *exp2()*, *log()*, *log2()*, *log10()*
+ - *exp()*, *exp2()*, *erf()*, *log()*, *log2()*, *log10()*
  - *sin()*, *cos()*, *tan()*
  - *asin()*, *acos()*, *atan()*
  - *sinh()*, *cosh()*, *tanh()*
@@ -62,6 +62,11 @@ Parsing rules:
  - *a^b^c* is *(a^b)^c*
 
 ## Changes
+
+### In Git trunk:
+
+ - Implement *erf()*.
+ - lolremez can now also act as a simple command line calculator.
 
 ### News for LolRemez 0.4:
 

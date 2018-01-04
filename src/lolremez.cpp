@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2017 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2018 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -48,6 +48,7 @@ static void usage()
     printf("Mandatory arguments to long options are mandatory for short options too.\n");
     printf("  -d, --degree <degree>      degree of final polynomial\n");
     printf("  -r, --range <xmin>:<xmax>  range over which to approximate\n");
+    printf("  -p, --precision <bits>     floating-point precision (default 512)\n");
     printf("      --progress             print progress\n");
     printf("      --stats                print timing statistics\n");
     printf("  -h, --help                 display this help and exit\n");
@@ -97,16 +98,16 @@ int main(int argc, char **argv)
     remez_solver solver;
 
     lol::getopt opt(argc, argv);
-    opt.add_opt('h', "help",     false);
-    opt.add_opt('v', "version",  false);
-    opt.add_opt('d', "degree",   true);
-    opt.add_opt('r', "range",    true);
-    opt.add_opt(200, "float",    false);
-    opt.add_opt(201, "double",   false);
+    opt.add_opt('h', "help",      false);
+    opt.add_opt('v', "version",   false);
+    opt.add_opt('d', "degree",    true);
+    opt.add_opt('r', "range",     true);
+    opt.add_opt('p', "precision", true);
+    opt.add_opt(200, "float",     false);
+    opt.add_opt(201, "double",    false);
     opt.add_opt(202, "long-double", false);
-    opt.add_opt(203, "stats",    false);
-    opt.add_opt(204, "progress", false);
-    opt.add_opt(205, "calc",     true);
+    opt.add_opt(203, "stats",     false);
+    opt.add_opt(204, "progress",  false);
 
     for (;;)
     {
@@ -129,6 +130,12 @@ int main(int argc, char **argv)
             str_xmin = arg[0];
             str_xmax = arg[1];
           } break;
+        case 'p': { /* --precision */
+            int bits = atoi(opt.arg);
+            if (bits < 32 || bits > 65535)
+                FAIL("invalid precision %s", opt.arg);
+            real::DEFAULT_BIGIT_COUNT = (bits + 31) / 32;
+          } break;
         case 200: /* --float */
             mode = mode_float;
             break;
@@ -144,16 +151,6 @@ int main(int argc, char **argv)
         case 204: /* --progress */
             show_progress = true;
             break;
-        case 205: { /* --calc */
-            expression ex;
-            if (!ex.parse(opt.arg))
-                FAIL("invalid range syntax: %s", opt.arg);
-            if (!ex.is_constant())
-                FAIL("invalid range: expression must be constant");
-            ex.eval(real::R_0()).print(40);
-            printf("\n");
-            return EXIT_SUCCESS;
-          } break;
         case 'h': /* --help */
             usage();
             return EXIT_SUCCESS;
@@ -169,13 +166,13 @@ int main(int argc, char **argv)
     lol::real xmin, xmax;
     expression ex;
 
-    if (!ex.parse(str_xmin.c_str()))
+    if (!ex.parse(str_xmin))
         FAIL("invalid range xmin syntax: %s", str_xmin.c_str());
     if (!ex.is_constant())
         FAIL("invalid range: xmin must be constant");
     xmin = ex.eval(real::R_0());
 
-    if (!ex.parse(str_xmax.c_str()))
+    if (!ex.parse(str_xmax))
         FAIL("invalid range xmax syntax: %s", str_xmax.c_str());
     if (!ex.is_constant())
         FAIL("invalid range: xmax must be constant");
@@ -194,11 +191,26 @@ int main(int argc, char **argv)
 
     has_weight = (opt.index + 1 < argc);
 
-    if (!solver.set_func(argv[opt.index]))
+    if (!ex.parse(argv[opt.index]))
         FAIL("invalid function: %s", argv[opt.index]);
 
-    if (has_weight && !solver.set_weight(argv[opt.index + 1]))
-        FAIL("invalid weight function: %s", argv[opt.index + 1]);
+    /* Special case: if the function is constant, evaluate it immediately */
+    if (ex.is_constant())
+    {
+        ex.eval(real::R_0()).print(int(real::DEFAULT_BIGIT_COUNT * 16 / 3.321928094) + 2);
+        printf("\n");
+        return EXIT_SUCCESS;
+    }
+
+    solver.set_func(ex);
+
+    if (has_weight)
+    {
+        if (!ex.parse(argv[opt.index + 1]))
+            FAIL("invalid weight function: %s", argv[opt.index + 1]);
+
+        solver.set_weight(ex);
+    }
 
     /* https://en.wikipedia.org/wiki/Floating-point_arithmetic#Internal_representation */
     int digits = mode == mode_float ? FLT_DIG + 2 :

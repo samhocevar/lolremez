@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2017 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2018 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -66,15 +66,15 @@ void remez_solver::set_range(real a, real b)
     m_xmax = b;
 }
 
-bool remez_solver::set_func(char const *func)
+void remez_solver::set_func(expression const &expr)
 {
-    return m_func.parse(func);
+    m_func = expr;
 }
 
-bool remez_solver::set_weight(char const *weight)
+void remez_solver::set_weight(expression const &expr)
 {
-    m_has_weight = !!weight;
-    return weight ? m_weight.parse(weight) : true;
+    m_has_weight = !expr.is_constant();
+    m_weight = expr;
 }
 
 void remez_solver::do_init()
@@ -168,7 +168,7 @@ void remez_solver::remez_init()
  */
 void remez_solver::remez_step()
 {
-    Timer t;
+    timer t;
 
     /* Pick up x_i where error will be 0 and compute f(x_i) */
     array<real> fxn;
@@ -214,7 +214,7 @@ void remez_solver::remez_step()
     if (show_stats)
     {
         using std::printf;
-        printf(" -:- timing for inversion: %f ms\n", t.Get() * 1000.f);
+        printf(" -:- timing for inversion: %f ms\n", t.get() * 1000.f);
     }
 }
 
@@ -228,7 +228,7 @@ void remez_solver::remez_step()
  */
 void remez_solver::find_zeros()
 {
-    Timer t;
+    timer t;
 
     static real const limit = real("1e-150");
     static real const zero = real("0");
@@ -269,7 +269,7 @@ void remez_solver::find_zeros()
     if (show_stats)
     {
         using std::printf;
-        printf(" -:- timing for zeros: %f ms\n", t.Get() * 1000.f);
+        printf(" -:- timing for zeros: %f ms\n", t.get() * 1000.f);
     }
 }
 
@@ -285,7 +285,7 @@ void remez_solver::find_zeros()
  */
 void remez_solver::find_extrema()
 {
-    Timer t;
+    timer t;
 
     m_control[0] = -1;
     m_control[m_order + 1] = 1;
@@ -335,7 +335,7 @@ void remez_solver::find_extrema()
     if (show_stats)
     {
         using std::printf;
-        printf(" -:- timing for extrema: %f ms\n", t.Get() * 1000.f);
+        printf(" -:- timing for extrema: %f ms\n", t.get() * 1000.f);
         printf(" -:- error: ");
         m_error.print(m_digits);
         printf("\n");
