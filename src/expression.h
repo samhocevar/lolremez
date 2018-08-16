@@ -44,6 +44,8 @@ enum class id : uint8_t
     add, sub, mul, div,
     atan2, pow,
     min, max,
+    /* Conversion functions */
+    tofloat, todouble, toldouble,
 };
 
 struct expression
@@ -111,6 +113,10 @@ struct expression
             case id::pow:   stack.push(pow(stack.pop(), head));   break;
             case id::min:   stack.push(min(stack.pop(), head));   break;
             case id::max:   stack.push(max(stack.pop(), head));   break;
+
+            case id::tofloat:   stack.push(lol::real(float(head))); break;
+            case id::todouble:  stack.push(lol::real(double(head))); break;
+            case id::toldouble: stack.push(lol::real(lol::ldouble(head))); break;
 
             case id::x:
             case id::y:
@@ -221,7 +227,10 @@ private:
                              TAOCPP_PEGTL_STRING("atan"),
                              TAOCPP_PEGTL_STRING("sinh"),
                              TAOCPP_PEGTL_STRING("cosh"),
-                             TAOCPP_PEGTL_STRING("tanh")> {};
+                             TAOCPP_PEGTL_STRING("tanh"),
+                             TAOCPP_PEGTL_STRING("float"),
+                             TAOCPP_PEGTL_STRING("double"),
+                             TAOCPP_PEGTL_STRING("ldouble")> {};
 
     struct r_unary_call : seq<r_unary_fun,
                               _, one<'('>,
@@ -391,6 +400,9 @@ struct expression::action<expression::r_unary_call>
             { id::asin,  "asin" },
             { id::acos,  "acos" },
             { id::atan,  "atan" },
+            { id::tofloat,   "float" },
+            { id::todouble,  "double" },
+            { id::toldouble, "ldouble" },
         };
 
         for (auto pair : lut)
