@@ -41,9 +41,10 @@ enum class id : uint8_t
     asin, acos, atan,
     sinh, cosh, tanh,
     /* Binary functions/operators */
-    add, sub, mul, div,
+    add, sub, mul, div, mod,
     atan2, pow,
     min, max,
+    fmod,
     /* Conversion functions */
     tofloat, todouble, toldouble,
 };
@@ -113,6 +114,8 @@ struct expression
             case id::pow:   stack.push(pow(stack.pop(), head));   break;
             case id::min:   stack.push(min(stack.pop(), head));   break;
             case id::max:   stack.push(max(stack.pop(), head));   break;
+            case id::mod:
+            case id::fmod:  stack.push(fmod(stack.pop(), head)); break;
 
             case id::tofloat:   stack.push(lol::real(float(head))); break;
             case id::todouble:  stack.push(lol::real(double(head))); break;
@@ -200,7 +203,8 @@ private:
     struct r_binary_fun : sor<TAOCPP_PEGTL_STRING("atan2"),
                               TAOCPP_PEGTL_STRING("pow"),
                               TAOCPP_PEGTL_STRING("min"),
-                              TAOCPP_PEGTL_STRING("max")> {};
+                              TAOCPP_PEGTL_STRING("max"),
+                              TAOCPP_PEGTL_STRING("fmod")> {};
 
     struct r_binary_call : seq<r_binary_fun,
                                _, one<'('>,
@@ -277,11 +281,13 @@ private:
 
     // r_mul <- "*" r_signed2
     // r_div <- "/" r_signed2
-    // r_term <- r_signed2 ( r_mul / r_div ) *
+    // r_mod <- "%" r_signed2
+    // r_term <- r_signed2 ( r_mul / r_div / r_mod ) *
     struct r_mul : seq<_, one<'*'>, _, r_signed2> {};
     struct r_div : seq<_, one<'/'>, _, r_signed2> {};
+    struct r_mod : seq<_, one<'%'>, _, r_signed2> {};
     struct r_term : seq<r_signed2,
-                        star<sor<r_mul, r_div>>> {};
+                        star<sor<r_mul, r_div, r_mod>>> {};
 
     // r_add <- "+" r_term
     // r_sub <- "-" r_term
@@ -316,8 +322,8 @@ public:
      */
     bool parse(std::string const &str)
     {
-        m_ops.empty();
-        m_constants.empty();
+        m_ops.clear();
+        m_constants.clear();
 
         tao::pegtl::memory_input<> in(str, "expression");
         try
@@ -340,6 +346,7 @@ public:
 template<> struct expression::action<expression::r_pow> : generic_action<id::pow> {};
 template<> struct expression::action<expression::r_mul> : generic_action<id::mul> {};
 template<> struct expression::action<expression::r_div> : generic_action<id::div> {};
+template<> struct expression::action<expression::r_mod> : generic_action<id::mod> {};
 template<> struct expression::action<expression::r_add> : generic_action<id::add> {};
 template<> struct expression::action<expression::r_sub> : generic_action<id::sub> {};
 template<> struct expression::action<expression::r_negative> : generic_action<id::minus> {};
@@ -361,6 +368,7 @@ struct expression::action<expression::r_binary_call>
             { id::pow,   "pow" },
             { id::min,   "min" },
             { id::max,   "max" },
+            { id::fmod,  "fmod" },
         };
 
         for (auto pair : lut)

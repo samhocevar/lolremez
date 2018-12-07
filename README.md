@@ -33,9 +33,10 @@ double f(double x)
 
 Binary functions/operators:
 
- - \+ \- \* /
+ - \+ \- \* / %
  - *atan2(y, x)*, *pow(x, y)*
  - *min(x, y)*, *max(x, y)*
+ - *fmod(x, y)*
 
 Exponent shortcuts:
 
@@ -66,6 +67,7 @@ Parsing rules:
 ### In Git trunk:
 
  - Implement *erf()*.
+ - Implement *%* and *fmod()*.
  - lolremez can now also act as a simple command line calculator.
 
 ### News for LolRemez 0.4:
