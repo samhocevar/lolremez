@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 
     lol::getopt opt(argc, argv);
     opt.add_opt('h', "help",      false);
-    opt.add_opt('v', "version",   false);
+    opt.add_opt('V', "version",   false);
     opt.add_opt('d', "degree",    true);
     opt.add_opt('r', "range",     true);
     opt.add_opt('p', "precision", true);
