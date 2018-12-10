@@ -230,7 +230,6 @@ void remez_solver::find_zeros()
 {
     timer t;
 
-    static real const limit = real("1e-150");
     static real const zero = real("0");
 
     /* Initialise an [a,b] bracket for each zero we try to find */
@@ -256,7 +255,7 @@ void remez_solver::find_zeros()
         point const &b = m_zeros_state[i].m2;
         point const &c = m_zeros_state[i].m3;
 
-        if (c.err == zero || fabs(a.x - b.x) <= limit)
+        if (c.err == zero || fabs(a.x - b.x) <= m_epsilon)
         {
             m_zeros[i] = c.x;
             ++finished;
@@ -318,9 +317,7 @@ void remez_solver::find_extrema()
         point const &b = m_extrema_state[i].m2;
         point const &c = m_extrema_state[i].m3;
 
-        static real const limit = real("1e-150");
-
-        if (b.x - a.x <= limit)
+        if (b.x - a.x <= m_epsilon)
         {
             m_control[i + 1] = c.x;
             if (c.err > m_error)
