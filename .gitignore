@@ -58,3 +58,5 @@ binaries/*Release
 *.opensdf
 # ReSharper cruft
 _ReSharper.*
+# Our binaries
+lolremez

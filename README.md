@@ -87,6 +87,11 @@ Finally, build the project:
 
     make
 
+The resulting executable is `lolremez`. You can manually copy it to any
+installation location, or run the following:
+
+    sudo make install
+
 ## Changes
 
 ### In Git trunk:
