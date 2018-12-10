@@ -4,6 +4,8 @@ A Remez algorithm implementation to approximate functions using polynomials.
 
 A tutorial is available [in the wiki section](https://github.com/samhocevar/lolremez/wiki).
 
+Build instructions are available below.
+
 ## Example
 
 Approximate `atan(sqrt(3+x³)-exp(1+x))` over the range `[sqrt(2),pi²]` with a 5th degree polynomial for `double` floats:
@@ -61,6 +63,29 @@ Parsing rules:
 
  - *-a^b* is *-(a^b)*
  - *a^b^c* is *(a^b)^c*
+
+## Build LolRemez
+
+### Setup
+
+Make sure the Git submodules are properly initialised:
+
+    git submodule update --init --recursive
+
+On Linux, make sure the following packages are installed:
+
+    automake autoconf libtool pkg-config
+
+### Compile
+
+Then bootstrap the project and configure it:
+
+    ./bootstrap
+    ./configure
+
+Finally, build the project:
+
+    make
 
 ## Changes
 
