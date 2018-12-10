@@ -312,24 +312,24 @@ void remez_solver::find_extrema()
     /* Watch all brackets for updates from worker threads */
     for (int finished = 0; finished < m_order; )
     {
-        int i = m_answers.pop();
+        int i = m_answers.pop() - 1000;
 
-        point const &a = m_extrema_state[i - 1000].m1;
-        point const &b = m_extrema_state[i - 1000].m2;
-        point const &c = m_extrema_state[i - 1000].m3;
+        point const &a = m_extrema_state[i].m1;
+        point const &b = m_extrema_state[i].m2;
+        point const &c = m_extrema_state[i].m3;
 
         static real const limit = real("1e-150");
 
         if (b.x - a.x <= limit)
         {
-            m_control[i - 1000 + 1] = c.x;
+            m_control[i + 1] = c.x;
             if (c.err > m_error)
                 m_error = c.err;
             ++finished;
             continue;
         }
 
-        m_questions.push(i);
+        m_questions.push(i + 1000);
     }
 
     if (show_stats)
@@ -405,9 +405,11 @@ void remez_solver::worker_thread()
         }
         else if (i < 2000)
         {
-            point &a = m_extrema_state[i - 1000].m1;
-            point &b = m_extrema_state[i - 1000].m2;
-            point &c = m_extrema_state[i - 1000].m3;
+            i -= 1000;
+
+            point &a = m_extrema_state[i].m1;
+            point &b = m_extrema_state[i].m2;
+            point &c = m_extrema_state[i].m3;
             point d;
 
             real const d1 = c.x - a.x, d2 = c.x - b.x;
@@ -433,7 +435,7 @@ void remez_solver::worker_thread()
                 c = d;
             }
 
-            m_answers.push(i);
+            m_answers.push(i + 1000);
         }
     }
 }
