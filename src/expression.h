@@ -174,16 +174,16 @@ private:
                                      plus<digit>>>> {};
 
     // r_sup_digit <- "⁰" / "¹" / "²" / "³" / "⁴" / "⁵" / "⁶" / "⁷" / "⁸" / "⁹"
-    struct r_sup_digit : sor<TAOCPP_PEGTL_STRING("⁰"),
-                             TAOCPP_PEGTL_STRING("¹"),
-                             TAOCPP_PEGTL_STRING("²"),
-                             TAOCPP_PEGTL_STRING("³"),
-                             TAOCPP_PEGTL_STRING("⁴"),
-                             TAOCPP_PEGTL_STRING("⁵"),
-                             TAOCPP_PEGTL_STRING("⁶"),
-                             TAOCPP_PEGTL_STRING("⁷"),
-                             TAOCPP_PEGTL_STRING("⁸"),
-                             TAOCPP_PEGTL_STRING("⁹")> {};
+    struct r_sup_digit : sor<TAO_PEGTL_STRING("⁰"),
+                             TAO_PEGTL_STRING("¹"),
+                             TAO_PEGTL_STRING("²"),
+                             TAO_PEGTL_STRING("³"),
+                             TAO_PEGTL_STRING("⁴"),
+                             TAO_PEGTL_STRING("⁵"),
+                             TAO_PEGTL_STRING("⁶"),
+                             TAO_PEGTL_STRING("⁷"),
+                             TAO_PEGTL_STRING("⁸"),
+                             TAO_PEGTL_STRING("⁹")> {};
 
     // r_sup_float <- <r_sup_digit> +
     struct r_sup_float : plus<r_sup_digit> {};
@@ -191,20 +191,20 @@ private:
     // r_name <- r_hex_float / r_float / "x" / "y" / "e" / "pi" / "π" / "tau" / "τ"
     struct r_name : sor<r_hex_float,
                         r_float,
-                        TAOCPP_PEGTL_STRING("x"),
-                        TAOCPP_PEGTL_STRING("y"),
-                        TAOCPP_PEGTL_STRING("e"),
-                        TAOCPP_PEGTL_STRING("pi"),
-                        TAOCPP_PEGTL_STRING("π"),
-                        TAOCPP_PEGTL_STRING("tau"),
-                        TAOCPP_PEGTL_STRING("τ")> {};
+                        TAO_PEGTL_STRING("x"),
+                        TAO_PEGTL_STRING("y"),
+                        TAO_PEGTL_STRING("e"),
+                        TAO_PEGTL_STRING("pi"),
+                        TAO_PEGTL_STRING("π"),
+                        TAO_PEGTL_STRING("tau"),
+                        TAO_PEGTL_STRING("τ")> {};
 
     // r_binary_call <- <r_binary_fun> "(" r_expr "," r_expr ")"
-    struct r_binary_fun : sor<TAOCPP_PEGTL_STRING("atan2"),
-                              TAOCPP_PEGTL_STRING("pow"),
-                              TAOCPP_PEGTL_STRING("min"),
-                              TAOCPP_PEGTL_STRING("max"),
-                              TAOCPP_PEGTL_STRING("fmod")> {};
+    struct r_binary_fun : sor<TAO_PEGTL_STRING("atan2"),
+                              TAO_PEGTL_STRING("pow"),
+                              TAO_PEGTL_STRING("min"),
+                              TAO_PEGTL_STRING("max"),
+                              TAO_PEGTL_STRING("fmod")> {};
 
     struct r_binary_call : seq<r_binary_fun,
                                _, one<'('>,
@@ -214,27 +214,27 @@ private:
                                _, one<')'>> {};
 
     // r_unary_call <- <r_unary_fun> "(" r_expr ")"
-    struct r_unary_fun : sor<TAOCPP_PEGTL_STRING("abs"),
-                             TAOCPP_PEGTL_STRING("sqrt"),
-                             TAOCPP_PEGTL_STRING("cbrt"),
-                             TAOCPP_PEGTL_STRING("exp"),
-                             TAOCPP_PEGTL_STRING("exp2"),
-                             TAOCPP_PEGTL_STRING("erf"),
-                             TAOCPP_PEGTL_STRING("log"),
-                             TAOCPP_PEGTL_STRING("log2"),
-                             TAOCPP_PEGTL_STRING("log10"),
-                             TAOCPP_PEGTL_STRING("sin"),
-                             TAOCPP_PEGTL_STRING("cos"),
-                             TAOCPP_PEGTL_STRING("tan"),
-                             TAOCPP_PEGTL_STRING("asin"),
-                             TAOCPP_PEGTL_STRING("acos"),
-                             TAOCPP_PEGTL_STRING("atan"),
-                             TAOCPP_PEGTL_STRING("sinh"),
-                             TAOCPP_PEGTL_STRING("cosh"),
-                             TAOCPP_PEGTL_STRING("tanh"),
-                             TAOCPP_PEGTL_STRING("float"),
-                             TAOCPP_PEGTL_STRING("double"),
-                             TAOCPP_PEGTL_STRING("ldouble")> {};
+    struct r_unary_fun : sor<TAO_PEGTL_STRING("abs"),
+                             TAO_PEGTL_STRING("sqrt"),
+                             TAO_PEGTL_STRING("cbrt"),
+                             TAO_PEGTL_STRING("exp"),
+                             TAO_PEGTL_STRING("exp2"),
+                             TAO_PEGTL_STRING("erf"),
+                             TAO_PEGTL_STRING("log"),
+                             TAO_PEGTL_STRING("log2"),
+                             TAO_PEGTL_STRING("log10"),
+                             TAO_PEGTL_STRING("sin"),
+                             TAO_PEGTL_STRING("cos"),
+                             TAO_PEGTL_STRING("tan"),
+                             TAO_PEGTL_STRING("asin"),
+                             TAO_PEGTL_STRING("acos"),
+                             TAO_PEGTL_STRING("atan"),
+                             TAO_PEGTL_STRING("sinh"),
+                             TAO_PEGTL_STRING("cosh"),
+                             TAO_PEGTL_STRING("tanh"),
+                             TAO_PEGTL_STRING("float"),
+                             TAO_PEGTL_STRING("double"),
+                             TAO_PEGTL_STRING("ldouble")> {};
 
     struct r_unary_call : seq<r_unary_fun,
                               _, one<'('>,

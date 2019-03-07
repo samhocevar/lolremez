@@ -5,13 +5,11 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-core", "lol\src\lol-core.vcxproj", "{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-bullet", "lol\src\3rdparty\lol-bullet.vcxproj", "{83D3B207-C601-4025-8F41-01DEDC354661}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-lua", "lol\src\3rdparty\lol-lua.vcxproj", "{D84021CA-B233-4E0F-8A52-071B83BBCCC4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{1AFD580B-98B8-4689-B661-38C41132C60E}"
 	ProjectSection(SolutionItems) = preProject
-		msbuild\config-build.xml = msbuild\config-build.xml
+		build.config = build.config
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lolremez", "src\lolremez.vcxproj", "{5581AC22-33DD-40E3-AB32-3514A697057B}"
@@ -38,16 +36,6 @@ Global
 		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Release|Win32.Build.0 = Release|Win32
 		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Release|x64.ActiveCfg = Release|x64
 		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Release|x64.Build.0 = Release|x64
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Debug|ORBIS.ActiveCfg = Debug|Win32
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Debug|Win32.ActiveCfg = Debug|Win32
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Debug|Win32.Build.0 = Debug|Win32
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Debug|x64.ActiveCfg = Debug|x64
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Debug|x64.Build.0 = Debug|x64
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Release|ORBIS.ActiveCfg = Release|Win32
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Release|Win32.ActiveCfg = Release|Win32
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Release|Win32.Build.0 = Release|Win32
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Release|x64.ActiveCfg = Release|x64
-		{83D3B207-C601-4025-8F41-01DEDC354661}.Release|x64.Build.0 = Release|x64
 		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Debug|ORBIS.ActiveCfg = Debug|Win32
 		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Debug|Win32.Build.0 = Debug|Win32
@@ -76,7 +64,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA} = {1AFD580B-98B8-4689-B661-38C41132C60E}
-		{83D3B207-C601-4025-8F41-01DEDC354661} = {1AFD580B-98B8-4689-B661-38C41132C60E}
 		{D84021CA-B233-4E0F-8A52-071B83BBCCC4} = {1AFD580B-98B8-4689-B661-38C41132C60E}
 		{5581AC22-33DD-40E3-AB32-3514A697057B} = {03B9D2E1-AFBA-4F66-8DE0-6499C9F9155F}
 	EndGlobalSection
