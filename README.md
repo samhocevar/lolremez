@@ -94,10 +94,12 @@ installation location, or run the following:
 
 ## Changes
 
-### In Git trunk:
+### News for LolRemez 0.5:
 
+ - Fix a severe bug in *cbrt()*.
  - Implement *erf()*.
  - Implement *%* and *fmod()*.
+ - Make the executable size even smaller.
  - lolremez can now also act as a simple command line calculator.
 
 ### News for LolRemez 0.4:
