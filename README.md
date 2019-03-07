@@ -68,9 +68,11 @@ Parsing rules:
 
 ### Setup
 
-Make sure the Git submodules are properly initialised:
+If you got the source code from Git, make sure the submodules are properly initialised:
 
     git submodule update --init --recursive
+
+On Windows, just open `lolremez.sln` in Visual Studio.
 
 On Linux, make sure the following packages are installed:
 
@@ -78,7 +80,9 @@ On Linux, make sure the following packages are installed:
 
 ### Compile
 
-Then bootstrap the project and configure it:
+On Windows, just build the solution in Visual Studio.
+
+On Linux, bootstrap the project and configure it:
 
     ./bootstrap
     ./configure
