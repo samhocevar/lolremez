@@ -154,7 +154,7 @@ int main(int argc, char **argv)
         case 'h': /* --help */
             usage();
             return EXIT_SUCCESS;
-        case 'v': /* --version */
+        case 'V': /* --version */
             version();
             return EXIT_SUCCESS;
         default:
