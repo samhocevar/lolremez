@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2017 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2019 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -22,6 +22,9 @@
 //
 
 #include "tao/pegtl.hpp"
+
+#include <vector>
+#include <tuple>
 
 namespace grammar
 {
@@ -57,69 +60,81 @@ struct expression
     lol::real eval(lol::real const &x) const
     {
         /* Use a stack */
-        lol::array<lol::real> stack;
+        std::vector<lol::real> stack;
 
-        for (int i = 0; i < m_ops.count(); ++i)
+        auto pop_val = [&stack]() -> lol::real
+        {
+            auto ret = stack.back();
+            stack.pop_back();
+            return ret;
+        };
+
+        auto push_val = [&stack](lol::real const &v) -> void
+        {
+            stack.push_back(v);
+        };
+
+        for (size_t i = 0; i < m_ops.size(); ++i)
         {
             /* Rules that do not consume stack elements */
-            if (m_ops[i].m1 == id::x)
+            if (std::get<0>(m_ops[i]) == id::x)
             {
-                stack.push(x);
+                push_val(x);
                 continue;
             }
-            else if (m_ops[i].m1 == id::y)
+            else if (std::get<0>(m_ops[i]) == id::y)
             {
-                stack.push(0); // TODO
+                push_val(0); // TODO
                 continue;
             }
-            else if (m_ops[i].m1 == id::constant)
+            else if (std::get<0>(m_ops[i]) == id::constant)
             {
-                stack.push(m_constants[m_ops[i].m2]);
+                push_val(m_constants[std::get<1>(m_ops[i])]);
                 continue;
             }
 
             /* All other rules consume at least the head of the stack */
-            lol::real head = stack.pop();
+            lol::real head = pop_val();
 
-            switch (m_ops[i].m1)
+            switch (std::get<0>(m_ops[i]))
             {
-            case id::plus:  stack.push(head);  break;
-            case id::minus: stack.push(-head); break;
+            case id::plus:  push_val(head);  break;
+            case id::minus: push_val(-head); break;
 
-            case id::abs:   stack.push(fabs(head));  break;
-            case id::sqrt:  stack.push(sqrt(head));  break;
-            case id::cbrt:  stack.push(cbrt(head));  break;
-            case id::exp:   stack.push(exp(head));   break;
-            case id::exp2:  stack.push(exp2(head));  break;
-            case id::erf:   stack.push(erf(head));   break;
-            case id::log:   stack.push(log(head));   break;
-            case id::log2:  stack.push(log2(head));  break;
-            case id::log10: stack.push(log10(head)); break;
-            case id::sin:   stack.push(sin(head));   break;
-            case id::cos:   stack.push(cos(head));   break;
-            case id::tan:   stack.push(tan(head));   break;
-            case id::asin:  stack.push(asin(head));  break;
-            case id::acos:  stack.push(acos(head));  break;
-            case id::atan:  stack.push(atan(head));  break;
-            case id::sinh:  stack.push(sinh(head));  break;
-            case id::cosh:  stack.push(cosh(head));  break;
-            case id::tanh:  stack.push(tanh(head));  break;
+            case id::abs:   push_val(fabs(head));  break;
+            case id::sqrt:  push_val(sqrt(head));  break;
+            case id::cbrt:  push_val(cbrt(head));  break;
+            case id::exp:   push_val(exp(head));   break;
+            case id::exp2:  push_val(exp2(head));  break;
+            case id::erf:   push_val(erf(head));   break;
+            case id::log:   push_val(log(head));   break;
+            case id::log2:  push_val(log2(head));  break;
+            case id::log10: push_val(log10(head)); break;
+            case id::sin:   push_val(sin(head));   break;
+            case id::cos:   push_val(cos(head));   break;
+            case id::tan:   push_val(tan(head));   break;
+            case id::asin:  push_val(asin(head));  break;
+            case id::acos:  push_val(acos(head));  break;
+            case id::atan:  push_val(atan(head));  break;
+            case id::sinh:  push_val(sinh(head));  break;
+            case id::cosh:  push_val(cosh(head));  break;
+            case id::tanh:  push_val(tanh(head));  break;
 
-            case id::add:   stack.push(stack.pop() + head); break;
-            case id::sub:   stack.push(stack.pop() - head); break;
-            case id::mul:   stack.push(stack.pop() * head); break;
-            case id::div:   stack.push(stack.pop() / head); break;
+            case id::add:   push_val(pop_val() + head); break;
+            case id::sub:   push_val(pop_val() - head); break;
+            case id::mul:   push_val(pop_val() * head); break;
+            case id::div:   push_val(pop_val() / head); break;
 
-            case id::atan2: stack.push(atan2(stack.pop(), head)); break;
-            case id::pow:   stack.push(pow(stack.pop(), head));   break;
-            case id::min:   stack.push(min(stack.pop(), head));   break;
-            case id::max:   stack.push(max(stack.pop(), head));   break;
+            case id::atan2: push_val(atan2(pop_val(), head)); break;
+            case id::pow:   push_val(pow(pop_val(), head));   break;
+            case id::min:   push_val(min(pop_val(), head));   break;
+            case id::max:   push_val(max(pop_val(), head));   break;
             case id::mod:
-            case id::fmod:  stack.push(fmod(stack.pop(), head)); break;
+            case id::fmod:  push_val(fmod(pop_val(), head)); break;
 
-            case id::tofloat:   stack.push(lol::real(float(head))); break;
-            case id::todouble:  stack.push(lol::real(double(head))); break;
-            case id::toldouble: stack.push(lol::real(lol::ldouble(head))); break;
+            case id::tofloat:   push_val(lol::real(float(head))); break;
+            case id::todouble:  push_val(lol::real(double(head))); break;
+            case id::toldouble: push_val(lol::real(lol::ldouble(head))); break;
 
             case id::x:
             case id::y:
@@ -129,8 +144,8 @@ struct expression
             }
         }
 
-        ASSERT(stack.count() == 1);
-        return stack.pop();
+        ASSERT(stack.size() == 1);
+        return pop_val();
     }
 
     /*
@@ -138,16 +153,16 @@ struct expression
      */
     bool is_constant() const
     {
-        for (auto op : m_ops)
-            if (op.m1 == id::x)
+        for (auto const &op : m_ops)
+            if (std::get<0>(op) == id::x)
                 return false;
 
         return true;
     }
 
 private:
-    lol::array<id, int> m_ops;
-    lol::array<lol::real> m_constants;
+    std::vector<std::tuple<id, int>> m_ops;
+    std::vector<lol::real> m_constants;
 
 private:
     struct r_expr;
@@ -312,7 +327,7 @@ private:
     {
         static void apply0(expression *that)
         {
-            that->m_ops.push(OP, -1);
+            that->m_ops.push_back(std::make_tuple(OP, -1));
         }
     };
 
@@ -376,7 +391,7 @@ struct expression::action<expression::r_binary_call>
             if (strncmp(in.string().c_str(), pair.name, strlen(pair.name)) != 0)
                 continue;
 
-            that->m_ops.push(pair.ret, -1);
+            that->m_ops.push_back(std::make_tuple(pair.ret, -1));
             return;
         }
     }
@@ -418,7 +433,7 @@ struct expression::action<expression::r_unary_call>
             if (strncmp(in.string().c_str(), pair.name, strlen(pair.name)) != 0)
                 continue;
 
-            that->m_ops.push(pair.ret, -1);
+            that->m_ops.push_back(std::make_tuple(pair.ret, -1));
             return;
         }
     }
@@ -452,9 +467,9 @@ struct expression::action<expression::r_sup_float>
             }
         }
 
-        that->m_ops.push(id::constant, that->m_constants.count());
-        that->m_constants.push(val);
-        that->m_ops.push(id::pow, -1);
+        that->m_ops.push_back(std::make_tuple(id::constant, that->m_constants.size()));
+        that->m_constants.push_back(val);
+        that->m_ops.push_back(std::make_tuple(id::pow, -1));
     }
 };
 
@@ -465,20 +480,20 @@ struct expression::action<expression::r_name>
     static void apply(INPUT const &in, expression *that)
     {
         if (in.string() == "x")
-            that->m_ops.push(id::x, -1);
+            that->m_ops.push_back(std::make_tuple(id::x, -1));
         else if (in.string() == "y")
-            that->m_ops.push(id::y, -1);
+            that->m_ops.push_back(std::make_tuple(id::y, -1));
         else
         {
-            that->m_ops.push(id::constant, that->m_constants.count());
+            that->m_ops.push_back(std::make_tuple(id::constant, that->m_constants.size()));
             if (in.string() == "e")
-                that->m_constants.push(lol::real::R_E());
+                that->m_constants.push_back(lol::real::R_E());
             else if (in.string() == "pi" || in.string() == "π")
-                that->m_constants.push(lol::real::R_PI());
+                that->m_constants.push_back(lol::real::R_PI());
             else if (in.string() == "tau" || in.string() == "τ")
-                that->m_constants.push(lol::real::R_TAU());
+                that->m_constants.push_back(lol::real::R_TAU());
             else /* FIXME: check if the constant is already in the list */
-                that->m_constants.push(lol::real(in.string().c_str()));
+                that->m_constants.push_back(lol::real(in.string().c_str()));
         }
     }
 };

@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2018 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2019 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -32,7 +32,7 @@ remez_solver::remez_solver()
     for (int i = 0; i < 4; ++i)
     {
         auto th = new thread(std::bind(&remez_solver::worker_thread, this));
-        m_workers.push(th);
+        m_workers.push_back(th);
     }
 }
 
@@ -130,11 +130,11 @@ void remez_solver::remez_init()
 
     /* Initial estimates for the x_i where the error will be zero and
      * precompute f(x_i). */
-    array<real> fxn;
+    std::vector<real> fxn;
     for (int i = 0; i < m_order + 1; i++)
     {
         m_zeros[i] = (real)(2 * i - m_order) / (real)(m_order + 1);
-        fxn.push(eval_func(m_zeros[i]));
+        fxn.push_back(eval_func(m_zeros[i]));
     }
 
     /* We build a matrix of Chebyshev evaluations: row i contains the
@@ -171,9 +171,9 @@ void remez_solver::remez_step()
     timer t;
 
     /* Pick up x_i where error will be 0 and compute f(x_i) */
-    array<real> fxn;
+    std::vector<real> fxn;
     for (int i = 0; i < m_order + 2; i++)
-        fxn.push(eval_func(m_control[i]));
+        fxn.push_back(eval_func(m_control[i]));
 
     /* We build a matrix of Chebyshev evaluations: row i contains the
      * evaluations of x_i for polynomial order n = 0, 1, ... */
@@ -235,8 +235,8 @@ void remez_solver::find_zeros()
     /* Initialise an [a,b] bracket for each zero we try to find */
     for (int i = 0; i < m_order + 1; i++)
     {
-        point &a = m_zeros_state[i].m1;
-        point &b = m_zeros_state[i].m2;
+        point &a = m_zeros_state[i][0];
+        point &b = m_zeros_state[i][1];
 
         a.x = m_control[i];
         a.err = eval_estimate(a.x) - eval_func(a.x);
@@ -251,9 +251,9 @@ void remez_solver::find_zeros()
     {
         int i = m_answers.pop();
 
-        point const &a = m_zeros_state[i].m1;
-        point const &b = m_zeros_state[i].m2;
-        point const &c = m_zeros_state[i].m3;
+        point const &a = m_zeros_state[i][0];
+        point const &b = m_zeros_state[i][1];
+        point const &c = m_zeros_state[i][2];
 
         if (c.err == zero || fabs(a.x - b.x) <= m_epsilon)
         {
@@ -293,9 +293,9 @@ void remez_solver::find_extrema()
     /* Initialise an [a,b,c] bracket for each extremum we try to find */
     for (int i = 0; i < m_order; i++)
     {
-        point &a = m_extrema_state[i].m1;
-        point &b = m_extrema_state[i].m2;
-        point &c = m_extrema_state[i].m3;
+        point &a = m_extrema_state[i][0];
+        point &b = m_extrema_state[i][1];
+        point &c = m_extrema_state[i][2];
 
         a.x = m_zeros[i];
         b.x = m_zeros[i + 1];
@@ -313,9 +313,9 @@ void remez_solver::find_extrema()
     {
         int i = m_answers.pop() - 1000;
 
-        point const &a = m_extrema_state[i].m1;
-        point const &b = m_extrema_state[i].m2;
-        point const &c = m_extrema_state[i].m3;
+        point const &a = m_extrema_state[i][0];
+        point const &b = m_extrema_state[i][1];
+        point const &c = m_extrema_state[i][2];
 
         if (b.x - a.x <= m_epsilon)
         {
@@ -374,9 +374,9 @@ void remez_solver::worker_thread()
         }
         else if (i < 1000)
         {
-            point &a = m_zeros_state[i].m1;
-            point &b = m_zeros_state[i].m2;
-            point &c = m_zeros_state[i].m3;
+            point &a = m_zeros_state[i][0];
+            point &b = m_zeros_state[i][1];
+            point &c = m_zeros_state[i][2];
 
 #if 0
             /* This (regula falsi) is actually really slow */
@@ -404,9 +404,9 @@ void remez_solver::worker_thread()
         {
             i -= 1000;
 
-            point &a = m_extrema_state[i].m1;
-            point &b = m_extrema_state[i].m2;
-            point &c = m_extrema_state[i].m3;
+            point &a = m_extrema_state[i][0];
+            point &b = m_extrema_state[i][1];
+            point &c = m_extrema_state[i][2];
             point d;
 
             real const d1 = c.x - a.x, d2 = c.x - b.x;

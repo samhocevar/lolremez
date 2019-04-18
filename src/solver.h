@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2017 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2018 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -72,8 +72,8 @@ private:
     /* Solver state */
     lol::polynomial<lol::real> m_estimate;
 
-    lol::array<lol::real> m_zeros;
-    lol::array<lol::real> m_control;
+    std::vector<lol::real> m_zeros;
+    std::vector<lol::real> m_control;
 
     lol::real m_k1, m_k2, m_epsilon, m_error;
 
@@ -82,11 +82,11 @@ private:
         lol::real x, err;
     };
 
-    lol::array<point, point, point> m_zeros_state;
-    lol::array<point, point, point> m_extrema_state;
+    std::vector<std::array<point, 3>> m_zeros_state;
+    std::vector<std::array<point, 3>> m_extrema_state;
 
     /* Threading information */
-    lol::array<lol::thread *> m_workers;
+    std::vector<lol::thread *> m_workers;
     lol::queue<int> m_questions, m_answers;
 };
 

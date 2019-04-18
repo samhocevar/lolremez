@@ -1,7 +1,7 @@
 //
 //  Lol Engine — Sample math program: polynomials
 //
-//  Copyright © 2005—2017 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2019 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -38,7 +38,7 @@ struct solver
         m_ek(ivec2(iters))
     {
         for (int i = 0; i <= grid_size; ++i)
-            m_coeff.push(cheb(i, grid_size));
+            m_coeff.push_back(cheb(i, grid_size));
     }
 
     void step()
@@ -61,40 +61,40 @@ struct solver
         /* Compute d_k = 1/e_{k-1}(x,y) */
         real dk = real::R_1() / best_val;
 
-        /* Compute e_{k-1}(x_k,y) as an array of f(x_i,y) components
-         * and e_{k-1}(x,y_k) as an array of f(x,y_i) components */
-        array<real> ek_x, ek_y;
-        ek_x.resize(m_pivots.count() + 1);
-        ek_y.resize(m_pivots.count() + 1);
-        for (int i = 0; i < m_pivots.count(); ++i)
-            for (int j = 0; j < m_pivots.count(); ++j)
+        /* Compute e_{k-1}(x_k,y) as a vector of f(x_i,y) components
+         * and e_{k-1}(x,y_k) as a vector of f(x,y_i) components */
+        std::vector<real> ek_x, ek_y;
+        ek_x.resize(m_pivots.size() + 1);
+        ek_y.resize(m_pivots.size() + 1);
+        for (size_t i = 0; i < m_pivots.size(); ++i)
+            for (size_t j = 0; j < m_pivots.size(); ++j)
                 if (m_ek[i][j])
                 {
                     ek_x[j] += m_ek[i][j] * eval_f(m_pivots[i].x, best_pivot.y);
                     ek_y[i] += m_ek[i][j] * eval_f(best_pivot.x, m_pivots[j].y);
                 }
-        ek_x[m_pivots.count()] = 1; /* implicit f */
-        ek_y[m_pivots.count()] = 1; /* implicit f */
+        ek_x[m_pivots.size()] = 1; /* implicit f */
+        ek_y[m_pivots.size()] = 1; /* implicit f */
 
         /* Compute new fk */
-        for (int i = 0; i < m_pivots.count() + 1; ++i)
-            for (int j = 0; j < m_pivots.count() + 1; ++j)
+        for (size_t i = 0; i < m_pivots.size() + 1; ++i)
+            for (size_t j = 0; j < m_pivots.size() + 1; ++j)
                 m_ek[i][j] -= ek_y[i] * ek_x[j] * dk;
 
         /* Register new pivot */
-        m_pivots.push(best_pivot);
+        m_pivots.push_back(best_pivot);
     }
 
     real eval_f(real const &x, real const &y)
     {
-        static array<real,real,real> cache;
+        static std::vector<std::array<real, 3>> cache;
 
         for (auto const &v : cache)
-            if (x == v.m1 && y == v.m2)
-                return v.m3;
+            if (x == v[0] && y == v[1])
+                return v[2];
 
-        cache.push(x, y, f(x, y));
-        return cache.last().m3;
+        cache.push_back({x, y, f(x, y)});
+        return cache.back()[2];
     }
 
     real eval_ek(real const &x, real const &y)
@@ -103,8 +103,8 @@ struct solver
         real ret = eval_f(x, y);
 
         /* Then, the f(x_i,y)*f(x,y_j) parts */
-        for (int i = 0; i < m_pivots.count(); ++i)
-            for (int j = 0; j < m_pivots.count(); ++j)
+        for (size_t i = 0; i < m_pivots.size(); ++i)
+            for (size_t j = 0; j < m_pivots.size(); ++j)
                 if (m_ek[i][j])
                     ret += m_ek[i][j] * eval_f(m_pivots[i].x, y) * eval_f(x, m_pivots[j].y);
 
@@ -117,7 +117,7 @@ struct solver
         printf("e0(x,y)=f(x,y)\n");
         //printf("f0(x,y)=0\n");
 
-        for (int n = 0; n < m_pivots.count(); ++n)
+        for (int n = 0; n < (int)m_pivots.size(); ++n)
         {
             printf("x%d=", n+1); m_pivots[n].x.print(20); printf("\n");
             printf("y%d=", n+1); m_pivots[n].y.print(20); printf("\n");
@@ -126,7 +126,7 @@ struct solver
             //printf("f%d(x,y)=f%d(x,y)+e%d(x%d,y)*e%d(x,y%d)/d%d\n", n+1, n, n, n+1, n, n+1, n+1);
         }
 
-        printf("splot [-1:1][-1:1] e%d(x,y)\n", m_pivots.count());
+        printf("splot [-1:1][-1:1] e%d(x,y)\n", (int)m_pivots.size());
     }
 
 private:
@@ -149,8 +149,8 @@ private:
      */
     array2d<real> m_ek;
 
-    array<real> m_coeff;
-    array<rvec2> m_pivots;
+    std::vector<real> m_coeff;
+    std::vector<rvec2> m_pivots;
 };
 
 int main(int argc, char **argv)
