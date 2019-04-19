@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2018 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2019 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -15,6 +15,8 @@
 #endif
 
 #include <float.h>
+#include <iostream>
+#include <iomanip>
 
 #include <lol/engine.h>
 
@@ -28,38 +30,40 @@ using lol::real;
 
 static void version(void)
 {
-    printf("lolremez %s\n", PACKAGE_VERSION);
-    printf("Copyright © 2005—2017 Sam Hocevar <sam@hocevar.net>\n");
-    printf("This program is free software. It comes without any warranty, to the extent\n");
-    printf("permitted by applicable law. You can redistribute it and/or modify it under\n");
-    printf("the terms of the Do What the Fuck You Want to Public License, Version 2, as\n");
-    printf("published by the WTFPL Task Force. See http://www.wtfpl.net/ for more details.\n");
-    printf("\n");
-    printf("Written by Sam Hocevar. Report bugs to <sam@hocevar.net>.\n");
+    std::cout
+        << "lolremez " << PACKAGE_VERSION << "\n"
+        << "Copyright © 2005—2017 Sam Hocevar <sam@hocevar.net>\n"
+        << "This program is free software. It comes without any warranty, to the extent\n"
+        << "permitted by applicable law. You can redistribute it and/or modify it under\n"
+        << "the terms of the Do What the Fuck You Want to Public License, Version 2, as\n"
+        << "published by the WTFPL Task Force. See http://www.wtfpl.net/ for more details.\n"
+        << "\n"
+        << "Written by Sam Hocevar. Report bugs to <sam@hocevar.net>.\n";
 }
 
 static void usage()
 {
-    printf("Usage: lolremez [-d degree] [-r xmin:xmax] x-expression [x-error]\n");
-    printf("       lolremez -h | --help\n");
-    printf("       lolremez -V | --version\n"); 
-    printf("Find a polynomial approximation for x-expression.\n");
-    printf("\n");
-    printf("Mandatory arguments to long options are mandatory for short options too.\n");
-    printf("  -d, --degree <degree>      degree of final polynomial\n");
-    printf("  -r, --range <xmin>:<xmax>  range over which to approximate\n");
-    printf("  -p, --precision <bits>     floating-point precision (default 512)\n");
-    printf("      --progress             print progress\n");
-    printf("      --stats                print timing statistics\n");
-    printf("  -h, --help                 display this help and exit\n");
-    printf("  -V, --version              output version information and exit\n");
-    printf("\n");
-    printf("Examples:\n");
-    printf("  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\"\n");
-    printf("  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\" \"exp(1+x)\"\n");
-    printf("\n");
-    printf("Tutorial available on https://github.com/samhocevar/lolremez/wiki\n");
-    printf("Written by Sam Hocevar. Report bugs to <sam@hocevar.net>.\n");
+    std::cout
+        << "Usage: lolremez [-d degree] [-r xmin:xmax] x-expression [x-error]\n"
+        << "       lolremez -h | --help\n"
+        << "       lolremez -V | --version\n" 
+        << "Find a polynomial approximation for x-expression.\n"
+        << "\n"
+        << "Mandatory arguments to long options are mandatory for short options too.\n"
+        << "  -d, --degree <degree>      degree of final polynomial\n"
+        << "  -r, --range <xmin>:<xmax>  range over which to approximate\n"
+        << "  -p, --precision <bits>     floating-point precision (default 512)\n"
+        << "      --progress             print progress\n"
+        << "      --stats                print timing statistics\n"
+        << "  -h, --help                 display this help and exit\n"
+        << "  -V, --version              output version information and exit\n"
+        << "\n"
+        << "Examples:\n"
+        << "  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\"\n"
+        << "  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\" \"exp(1+x)\"\n"
+        << "\n"
+        << "Tutorial available on https://github.com/samhocevar/lolremez/wiki\n"
+        << "Written by Sam Hocevar. Report bugs to <sam@hocevar.net>.\n";
 }
 
 static void FAIL(char const *message = nullptr, ...)
@@ -197,8 +201,8 @@ int main(int argc, char **argv)
     /* Special case: if the function is constant, evaluate it immediately */
     if (ex.is_constant())
     {
-        ex.eval(real::R_0()).print(int(real::DEFAULT_BIGIT_COUNT * 16 / 3.321928094) + 2);
-        printf("\n");
+        std::cout << std::setprecision(int(real::DEFAULT_BIGIT_COUNT * 16 / 3.321928094) + 2);
+        std::cout << ex.eval(real::R_0()) << '\n';
         return EXIT_SUCCESS;
     }
 
@@ -233,11 +237,15 @@ int main(int argc, char **argv)
             auto p = solver.get_estimate();
             for (int j = 0; j < p.degree() + 1; j++)
             {
-                printf(j > 0 && p[j] >= real::R_0() ? "+" : "");
-                p[j].print(digits);
-                printf(j == 0 ? "" : j > 1 ? "*x**%d" : "*x", j);
+                if (j > 0 && p[j] >= real::R_0())
+                    std::cout << '+';
+                std::cout << std::setprecision(digits) << p[j];
+                if (j > 1)
+                    std::cout << "*x**" << j;
+                else if (j == 1)
+                    std::cout << "*x";
             }
-            printf("\n");
+            std::cout << '\n';
             fflush(stdout);
         }
     }
@@ -246,28 +254,28 @@ int main(int argc, char **argv)
     auto p = solver.get_estimate();
     char const *type = mode == mode_float ? "float" :
                        mode == mode_double ? "double" : "long double";
-    printf("/* Approximation of f(x) = %s\n", argv[opt.index]);
+    std::cout << "// Approximation of f(x) = " << argv[opt.index] << "\n";
     if (has_weight)
-        printf(" * with weight function g(x) = %s\n", argv[opt.index + 1]);
-    printf(" * on interval [ %s, %s ]\n", str_xmin.c_str(), str_xmax.c_str());
-    printf(" * with a polynomial of degree %d. */\n", p.degree());
-    printf("%s f(%s x)\n{\n", type, type);
+        std::cout << "// with weight function g(x) = " << argv[opt.index + 1] << "\n";
+    std::cout << "// on interval [ " << str_xmin << ", " << str_xmax << " ]\n";
+    std::cout << "// with a polynomial of degree " << p.degree() << ".\n";
+    std::cout << type << " f(" << type << " x)\n{\n";
     for (int j = p.degree(); j >= 0; --j)
     {
         char const *a = j ? "u = u * x +" : "return u * x +";
         if (j == p.degree())
-            printf("    %s u = ", type);
+            std::cout << "    " << type << " u = ";
         else
-            printf("    %s ", a);
-        p[j].print(digits);
+            std::cout << "    " << a << " ";
+        std::cout << std::setprecision(digits) << p[j];
         switch (mode)
         {
-            case mode_float: printf("f;\n"); break;
-            case mode_double: printf(";\n"); break;
-            case mode_long_double: printf("l;\n"); break;
+            case mode_float: std::cout << "f;\n"; break;
+            case mode_double: std::cout << ";\n"; break;
+            case mode_long_double: std::cout << "l;\n"; break;
         }
     }
-    printf("}\n");
+    std::cout << "}\n";
 
     return 0;
 }

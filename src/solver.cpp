@@ -15,6 +15,8 @@
 #endif
 
 #include <functional>
+#include <iostream>
+#include <iomanip>
 
 #include <lol/engine.h>
 
@@ -331,11 +333,8 @@ void remez_solver::find_extrema()
 
     if (show_stats)
     {
-        using std::printf;
-        printf(" -:- timing for extrema: %f ms\n", t.get() * 1000.f);
-        printf(" -:- error: ");
-        m_error.print(m_digits);
-        printf("\n");
+        std::cout << " -:- timing for extrema: " << (t.get() * 1000.f) << " ms\n";
+        std::cout << " -:- error: " << std::setprecision(m_digits) << m_error << "\n";
     }
 }
 

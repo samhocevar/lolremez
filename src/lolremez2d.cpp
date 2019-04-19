@@ -1,5 +1,5 @@
 //
-//  Lol Engine — Sample math program: polynomials
+//  LolRemez — Remez algorithm implementation
 //
 //  Copyright © 2005—2019 Sam Hocevar <sam@hocevar.net>
 //
@@ -14,7 +14,8 @@
 #   include "config.h"
 #endif
 
-#include <cstdio>
+#include <iostream>
+#include <iomanip>
 
 #include <lol/engine.h>
 
@@ -113,20 +114,23 @@ struct solver
 
     void dump_gnuplot()
     {
-        printf("f(x,y)=sin((1-x)/2*acos((1+y)/2))/sqrt(1-((y+1)/2)**2)\n");
-        printf("e0(x,y)=f(x,y)\n");
+        std::cout << "f(x,y)=sin((1-x)/2*acos((1+y)/2))/sqrt(1-((y+1)/2)**2)\n";
+        std::cout << "e0(x,y)=f(x,y)\n";
         //printf("f0(x,y)=0\n");
 
+        std::cout << std::setprecision(20);
         for (int n = 0; n < (int)m_pivots.size(); ++n)
         {
-            printf("x%d=", n+1); m_pivots[n].x.print(20); printf("\n");
-            printf("y%d=", n+1); m_pivots[n].y.print(20); printf("\n");
-            printf("d%d=e%d(x%d,y%d)\n", n+1, n, n+1, n+1);
-            printf("e%d(x,y)=e%d(x,y)-e%d(x%d,y)*e%d(x,y%d)/d%d\n", n+1, n, n, n+1, n, n+1, n+1);
+            std::cout << 'x' << (n+1) << '=' << m_pivots[n].x << '\n';
+            std::cout << 'y' << (n+1) << '=' << m_pivots[n].y << '\n';
+            std::cout << 'd' << (n+1) << "=e" << n << "(x" << (n+1) << ",y" << (n+1) << ")\n";
+            std::cout << 'e' << (n+1) << "(x,y)=e" << n << "(x,y)-e" << n
+                      << "(x" << (n+1) << ",y)*e" << n << "(x,y" << (n+1)
+                      << ")/d" << (n+1) << '\n';
             //printf("f%d(x,y)=f%d(x,y)+e%d(x%d,y)*e%d(x,y%d)/d%d\n", n+1, n, n, n+1, n, n+1, n+1);
         }
 
-        printf("splot [-1:1][-1:1] e%d(x,y)\n", (int)m_pivots.size());
+        std::cout << "splot [-1:1][-1:1] e" << m_pivots.size() << "(x,y)\n";
     }
 
 private:
