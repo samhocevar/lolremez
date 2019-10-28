@@ -256,15 +256,29 @@ int main(int argc, char **argv)
         }
     }
 
-    /* Print final estimate as a C function */
+    // Print final estimate
     auto p = solver.get_estimate();
     char const *type = mode == mode_float ? "float" :
                        mode == mode_double ? "double" : "long double";
-    std::cout << "// Approximation of f(x) = " << argv[opt.index] << "\n";
+    std::cout << "// Approximation of f(x) = " << argv[opt.index] << '\n';
     if (has_weight)
-        std::cout << "// with weight function g(x) = " << argv[opt.index + 1] << "\n";
+        std::cout << "// with weight function g(x) = " << argv[opt.index + 1] << '\n';
     std::cout << "// on interval [ " << str_xmin << ", " << str_xmax << " ]\n";
     std::cout << "// with a polynomial of degree " << p.degree() << ".\n";
+
+    // Print expression in Horner form
+    std::cout << std::setprecision(digits);
+    std::cout << "// p(x)=";
+    for (int j = 0; j < p.degree() - 1; ++j)
+        std::cout << '(';
+    std::cout << p[p.degree()];
+    for (int j = p.degree() - 1; j >= 0; --j)
+        std::cout << (j < p.degree() - 1 ? ")" : "") << "*x"
+                  << (p[j] > real::R_0() ? "+" : "") << p[j];
+    std::cout << '\n';
+
+    // Print C/C++ function
+    std::cout << std::setprecision(digits);
     std::cout << type << " f(" << type << " x)\n{\n";
     for (int j = p.degree(); j >= 0; --j)
     {
@@ -273,7 +287,7 @@ int main(int argc, char **argv)
             std::cout << "    " << type << " u = ";
         else
             std::cout << "    " << a << " ";
-        std::cout << std::setprecision(digits) << p[j];
+        std::cout << p[j];
         switch (mode)
         {
             case mode_float: std::cout << "f;\n"; break;
