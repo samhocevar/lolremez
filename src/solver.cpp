@@ -128,7 +128,7 @@ void remez_solver::remez_init()
     m_control.resize(m_order + 2);
 
     /* m_order extrema to find */
-    m_extrema_state.resize(m_order);
+    m_extrema_state.resize(m_order + 2);
 
     /* Initial estimates for the x_i where the error will be zero and
      * precompute f(x_i). */
@@ -274,16 +274,19 @@ void remez_solver::find_zeros()
     }
 }
 
-/*
- * Find m_order extrema of the error function. We maximise the relative
- * error, since its extrema are at slightly different locations than the
- * absolute error’s.
- *
- * The algorithm used here is successive parabolic interpolation. FIXME: we
- * could use Brent’s method instead, which combines parabolic interpolation
- * and golden ratio search and has superlinear convergence. However, the
- * real bottleneck for now is the root finding, so this has low priority.
- */
+
+// Find m_order + 2 extrema of the error function. We maximise the relative
+// error, since its extrema are at slightly different locations than the
+// absolute error’s.
+//
+// If the weight function is 1, we would only need to compute m_order extrema
+// because we already know that -1 and +1 are extrema. However when weighing
+// the error the extrema get slightly moved around.
+//
+// The algorithm used here is successive parabolic interpolation. FIXME: we
+// could use Brent’s method instead, which combines parabolic interpolation
+// and golden ratio search and has superlinear convergence. However, the
+// real bottleneck for now is the root finding, so this has low priority.
 void remez_solver::find_extrema()
 {
     timer t;
@@ -293,14 +296,14 @@ void remez_solver::find_extrema()
     m_error = 0;
 
     /* Initialise an [a,b,c] bracket for each extremum we try to find */
-    for (int i = 0; i < m_order; i++)
+    for (int i = 0; i < m_order + 2; i++)
     {
         point &a = m_extrema_state[i][0];
         point &b = m_extrema_state[i][1];
         point &c = m_extrema_state[i][2];
 
-        a.x = m_zeros[i];
-        b.x = m_zeros[i + 1];
+        a.x = i == 0 ? (real)-1 : m_zeros[i - 1];
+        b.x = i == m_order + 1 ? (real)1 : m_zeros[i];
         c.x = a.x + (b.x - a.x) * real(rand(0.4f, 0.6f));
 
         a.err = eval_error(a.x);
@@ -311,7 +314,7 @@ void remez_solver::find_extrema()
     }
 
     /* Watch all brackets for updates from worker threads */
-    for (int finished = 0; finished < m_order; )
+    for (int finished = 0; finished < m_order + 2; )
     {
         int i = m_answers.pop() - 1000;
 
@@ -321,7 +324,7 @@ void remez_solver::find_extrema()
 
         if (b.x - a.x <= m_epsilon)
         {
-            m_control[i + 1] = c.x;
+            m_control[i] = c.x;
             if (c.err > m_error)
                 m_error = c.err;
             ++finished;
