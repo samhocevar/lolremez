@@ -85,6 +85,10 @@ void remez_solver::do_init()
     m_k2 = (m_xmax - m_xmin) / 2;
     m_epsilon = pow((real)10, (real)-(m_digits + 2));
 
+    if (show_debug)
+        std::cout << std::setprecision(m_digits) << "[debug] k1: " << m_k1
+                  << " k2: " << m_k2 << " epsilon: " << m_epsilon << '\n';
+
     remez_init();
 }
 
@@ -335,10 +339,10 @@ void remez_solver::find_extrema()
     }
 
     if (show_stats)
-    {
         std::cout << " -:- timing for extrema: " << (t.get() * 1000.f) << " ms\n";
-        std::cout << " -:- error: " << std::setprecision(m_digits) << m_error << "\n";
-    }
+
+    if (show_debug)
+        std::cout << "[debug] error: " << std::setprecision(m_digits) << m_error << "\n";
 }
 
 real remez_solver::eval_estimate(real const &x)

@@ -45,6 +45,7 @@ public:
     lol::polynomial<lol::real> get_estimate() const;
 
     bool show_stats = false;
+    bool show_debug = false;
 
 private:
     void remez_init();

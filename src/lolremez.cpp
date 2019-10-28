@@ -98,6 +98,7 @@ int main(int argc, char **argv)
     bool has_weight = false;
     bool show_stats = false;
     bool show_progress = false;
+    bool show_debug = false;
 
     remez_solver solver;
 
@@ -112,6 +113,7 @@ int main(int argc, char **argv)
     opt.add_opt(202, "long-double", false);
     opt.add_opt(203, "stats",     false);
     opt.add_opt(204, "progress",  false);
+    opt.add_opt(205, "debug",     false);
 
     for (;;)
     {
@@ -154,6 +156,9 @@ int main(int argc, char **argv)
             break;
         case 204: /* --progress */
             show_progress = true;
+            break;
+        case 205: /* --debug */
+            show_debug = true;
             break;
         case 'h': /* --help */
             usage();
@@ -222,6 +227,7 @@ int main(int argc, char **argv)
     solver.set_digits(digits);
 
     solver.show_stats = show_stats;
+    solver.show_debug = show_debug;
 
     /* Solve polynomial */
     solver.do_init();
