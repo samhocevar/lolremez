@@ -21,6 +21,12 @@
 
 using namespace lol;
 
+// FIXME: use rvec2 when possible
+struct real2
+{
+    real x, y;
+};
+
 real f(real const &x, real const &y)
 {
     static real const one = real::R_1();
@@ -45,7 +51,7 @@ struct solver
     void step()
     {
         /* Find a new good pivot */
-        rvec2 best_pivot(0,0);
+        real2 best_pivot { 0, 0 };
         real best_val(0);
 
         for (auto const &y : m_coeff)
@@ -54,7 +60,7 @@ struct solver
             real res = eval_ek(x, y);
             if (abs(res) >= abs(best_val))
             {
-                best_pivot = rvec2(x,y);
+                best_pivot = { x, y };
                 best_val = res;
             }
         }
@@ -154,7 +160,7 @@ private:
     array2d<real> m_ek;
 
     std::vector<real> m_coeff;
-    std::vector<rvec2> m_pivots;
+    std::vector<real2> m_pivots;
 };
 
 int main(int argc, char **argv)
