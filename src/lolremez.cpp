@@ -18,14 +18,13 @@
 #include <iostream>
 #include <iomanip>
 
-#include <lol/engine.h>
-
+#include <lol/base/string.h>
+#include <lol/base/getopt.h>
 #include <lol/math/real.h>
 
 #include "solver.h"
 #include "expression.h"
 
-using lol::array;
 using lol::real;
 
 static void version(void)
@@ -130,8 +129,8 @@ int main(int argc, char **argv)
             solver.set_order(degree);
           } break;
         case 'r': { /* --range */
-            auto arg = lol::split(opt.arg, ':');
-            if (arg.count() != 2)
+            auto arg = lol::split(std::string(opt.arg), ':');
+            if (arg.size() != 2)
                 FAIL("invalid range");
             str_xmin = arg[0];
             str_xmax = arg[1];

@@ -21,15 +21,17 @@
 //   auto y = e.eval("1.5");
 //
 
-#include "tao/pegtl.hpp"
+#include <lol/base/pegtl.h>
 
 #include <vector>
 #include <tuple>
+#include <cassert>
 
 namespace grammar
 {
 
 using namespace tao::pegtl;
+using long_double = long double;
 
 enum class id : uint8_t
 {
@@ -134,7 +136,7 @@ struct expression
 
             case id::tofloat:   push_val(lol::real(float(head))); break;
             case id::todouble:  push_val(lol::real(double(head))); break;
-            case id::toldouble: push_val(lol::real(lol::ldouble(head))); break;
+            case id::toldouble: push_val(lol::real(long_double(head))); break;
 
             case id::x:
             case id::y:
@@ -144,7 +146,7 @@ struct expression
             }
         }
 
-        ASSERT(stack.size() == 1);
+        assert(stack.size() == 1);
         return pop_val();
     }
 

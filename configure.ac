@@ -14,6 +14,8 @@ AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE([subdir-objects no-define tar-ustar silent-rules dist-xz dist-zip])
 AM_DEFAULT_VERBOSITY=0
 
+CXXFLAGS="${CXXFLAGS} -std=c++17"
+
 AC_PROG_CXX
 AM_PROG_LIBTOOL
 AC_LIBTOOL_CXX
@@ -29,7 +31,7 @@ dnl
 dnl  Inherit all Lol Engine checks
 dnl
 
-LOL_AC_SUBPROJECT()
+#LOL_AC_SUBPROJECT()
 
 dnl
 dnl  Perform the actual commands

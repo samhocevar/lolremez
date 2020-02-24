@@ -18,8 +18,6 @@
 #include <iostream>
 #include <iomanip>
 
-#include <lol/engine.h>
-
 #include <lol/math/real.h>
 #include <lol/math/polynomial.h>
 

@@ -17,6 +17,9 @@
 // ----------------------
 //
 
+#include <lol/base/thread.h>
+#include <lol/math/polynomial.h>
+
 #include <cstdio>
 
 #include "expression.h"
