@@ -3,18 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-core", "lol\src\lol-core.vcxproj", "{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lol-lua", "lol\src\3rdparty\lol-lua.vcxproj", "{D84021CA-B233-4E0F-8A52-071B83BBCCC4}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "engine", "engine", "{1AFD580B-98B8-4689-B661-38C41132C60E}"
-	ProjectSection(SolutionItems) = preProject
-		build.config = build.config
-	EndProjectSection
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lolremez", "src\lolremez.vcxproj", "{5581AC22-33DD-40E3-AB32-3514A697057B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lolremez", "lolremez", "{03B9D2E1-AFBA-4F66-8DE0-6499C9F9155F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -26,26 +15,6 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Debug|ORBIS.ActiveCfg = Debug|Win32
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Debug|Win32.ActiveCfg = Debug|Win32
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Debug|Win32.Build.0 = Debug|Win32
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Debug|x64.ActiveCfg = Debug|x64
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Debug|x64.Build.0 = Debug|x64
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Release|ORBIS.ActiveCfg = Release|Win32
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Release|Win32.ActiveCfg = Release|Win32
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Release|Win32.Build.0 = Release|Win32
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Release|x64.ActiveCfg = Release|x64
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA}.Release|x64.Build.0 = Release|x64
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Debug|ORBIS.ActiveCfg = Debug|Win32
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Debug|Win32.ActiveCfg = Debug|Win32
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Debug|Win32.Build.0 = Debug|Win32
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Debug|x64.ActiveCfg = Debug|x64
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Debug|x64.Build.0 = Debug|x64
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Release|ORBIS.ActiveCfg = Release|Win32
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Release|Win32.ActiveCfg = Release|Win32
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Release|Win32.Build.0 = Release|Win32
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Release|x64.ActiveCfg = Release|x64
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4}.Release|x64.Build.0 = Release|x64
 		{5581AC22-33DD-40E3-AB32-3514A697057B}.Debug|ORBIS.ActiveCfg = Debug|ORBIS
 		{5581AC22-33DD-40E3-AB32-3514A697057B}.Debug|ORBIS.Build.0 = Debug|ORBIS
 		{5581AC22-33DD-40E3-AB32-3514A697057B}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -62,9 +31,7 @@ Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{9E62F2FE-3408-4EAE-8238-FD84238CEEDA} = {1AFD580B-98B8-4689-B661-38C41132C60E}
-		{D84021CA-B233-4E0F-8A52-071B83BBCCC4} = {1AFD580B-98B8-4689-B661-38C41132C60E}
-		{5581AC22-33DD-40E3-AB32-3514A697057B} = {03B9D2E1-AFBA-4F66-8DE0-6499C9F9155F}
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5D1104EC-6D18-4F41-841F-2A6E6A5744EF}
 	EndGlobalSection
 EndGlobal
