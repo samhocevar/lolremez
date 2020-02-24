@@ -18,8 +18,10 @@
 #include <iostream>
 #include <iomanip>
 
+#include <lol/base/thread.h>
 #include <lol/math/real.h>
 #include <lol/math/polynomial.h>
+#include <lol/math/rand.h>
 
 #include "matrix.h"
 #include "solver.h"
@@ -41,10 +43,10 @@ remez_solver::~remez_solver()
     /* Signal worker threads to quit, wait for worker threads to answer,
      * and kill worker threads. */
     for (auto worker : m_workers)
-        UNUSED(worker), m_questions.push(-1);
+        (void)worker, m_questions.push(-1);
 
     for (auto worker : m_workers)
-        UNUSED(worker), m_answers.pop();
+        (void)worker, m_answers.pop();
 
     for (auto worker : m_workers)
         delete worker;

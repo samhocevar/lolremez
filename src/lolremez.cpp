@@ -139,7 +139,7 @@ int main(int argc, char **argv)
             int bits = atoi(opt.arg);
             if (bits < 32 || bits > 65535)
                 FAIL("invalid precision %s", opt.arg);
-            real::DEFAULT_BIGIT_COUNT = (bits + 31) / 32;
+            real::global_bigit_count((bits + 31) / 32);
           } break;
         case 200: /* --float */
             mode = mode_float;
