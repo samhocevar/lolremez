@@ -1,6 +1,6 @@
 
 EXTRA_DIST = \
-    .gitignore lolremez.vcxproj lolremez.vcxproj.filters
+    lolremez.vcxproj lolremez.vcxproj.filters
 
 AM_CPPFLAGS = -I../lol/include
 

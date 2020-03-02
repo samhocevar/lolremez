@@ -98,6 +98,14 @@ installation location, or run the following:
 
 ## Changes
 
+### News for LolRemez 0.6:
+
+ - Fix a grave problem with extrema finding when using a weight function;
+   results were suboptimal.
+ - Switch to a header-only big float implementation that tremendously
+   improves build times.
+ - Print gnuplot-friendly formulas.
+
 ### News for LolRemez 0.5:
 
  - Fix a severe bug in *cbrt()*.
