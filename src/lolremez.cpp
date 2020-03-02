@@ -18,9 +18,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include <lol/base/string.h>
+#include <lol/base/utils.h>
 #include <lol/base/getopt.h>
-#include <lol/math/real.h>
+#include <lol/types/real.h>
 
 #include "solver.h"
 #include "expression.h"

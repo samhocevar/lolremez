@@ -19,7 +19,7 @@
 #include <iomanip>
 
 #include <lol/base/thread.h>
-#include <lol/math/real.h>
+#include <lol/types/real.h>
 #include <lol/math/polynomial.h>
 #include <lol/math/rand.h>
 

@@ -17,7 +17,7 @@
 #include <iostream>
 #include <iomanip>
 
-#include <lol/math/real.h>
+#include <lol/types/real.h>
 
 #include "matrix.h"
 
