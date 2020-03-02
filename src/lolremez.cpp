@@ -18,14 +18,13 @@
 #include <iostream>
 #include <iomanip>
 
-#include <lol/engine.h>
-
-#include <lol/math/real.h>
+#include <lol/base/utils.h>
+#include <lol/base/getopt.h>
+#include <lol/types/real.h>
 
 #include "solver.h"
 #include "expression.h"
 
-using lol::array;
 using lol::real;
 
 static void version(void)
@@ -130,8 +129,8 @@ int main(int argc, char **argv)
             solver.set_order(degree);
           } break;
         case 'r': { /* --range */
-            auto arg = lol::split(opt.arg, ':');
-            if (arg.count() != 2)
+            auto arg = lol::split(std::string(opt.arg), ':');
+            if (arg.size() != 2)
                 FAIL("invalid range");
             str_xmin = arg[0];
             str_xmax = arg[1];
@@ -140,7 +139,7 @@ int main(int argc, char **argv)
             int bits = atoi(opt.arg);
             if (bits < 32 || bits > 65535)
                 FAIL("invalid precision %s", opt.arg);
-            real::DEFAULT_BIGIT_COUNT = (bits + 31) / 32;
+            real::global_bigit_count((bits + 31) / 32);
           } break;
         case 200: /* --float */
             mode = mode_float;

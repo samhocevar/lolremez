@@ -1,12 +1,12 @@
 
-include $(top_srcdir)/lol/build/autotools/common.am
+lol_files := $(filter %.h %.ipp %.hpp, $(shell find $(srcdir)/lol/include -type f))
+git_files = .gitignore .gitattributes .gitmodules
+vs_files = lolremez.sln Directory.Build.props
 
-ACLOCAL_AMFLAGS = -I lol/build/autotools/m4
-EXTRA_DIST += bootstrap README.md \
-              .travis.yml lolremez.sln build.config \
-              .gitignore .gitattributes .gitmodules
+EXTRA_DIST = bootstrap README.md .travis.yml \
+             $(lol_files) $(git_files) $(vs_files)
 
-SUBDIRS = lol src
+SUBDIRS = src
 
 test: check
 

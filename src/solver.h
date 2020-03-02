@@ -17,7 +17,12 @@
 // ----------------------
 //
 
-#include <cstdio>
+#include <lol/base/thread.h>
+#include <lol/math/polynomial.h>
+#include <lol/types/real.h>
+
+#include <vector>
+#include <array>
 
 #include "expression.h"
 

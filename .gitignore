@@ -60,3 +60,4 @@ binaries/*Release
 _ReSharper.*
 # Our binaries
 lolremez
+src/lolremez2d

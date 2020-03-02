@@ -17,7 +17,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include <lol/engine.h>
+#include <lol/types/real.h>
+
+#include "matrix.h"
 
 using namespace lol;
 
@@ -42,7 +44,7 @@ struct solver
     solver(int grid_size, int iters)
       : m_grid_size(grid_size),
         m_iters(iters),
-        m_ek(ivec2(iters))
+        m_ek(iters, iters)
     {
         for (int i = 0; i <= grid_size; ++i)
             m_coeff.push_back(cheb(i, grid_size));
@@ -75,10 +77,10 @@ struct solver
         ek_y.resize(m_pivots.size() + 1);
         for (size_t i = 0; i < m_pivots.size(); ++i)
             for (size_t j = 0; j < m_pivots.size(); ++j)
-                if (m_ek[i][j])
+                if (m_ek[j][i])
                 {
-                    ek_x[j] += m_ek[i][j] * eval_f(m_pivots[i].x, best_pivot.y);
-                    ek_y[i] += m_ek[i][j] * eval_f(best_pivot.x, m_pivots[j].y);
+                    ek_x[j] += m_ek[j][i] * eval_f(m_pivots[i].x, best_pivot.y);
+                    ek_y[i] += m_ek[j][i] * eval_f(best_pivot.x, m_pivots[j].y);
                 }
         ek_x[m_pivots.size()] = 1; /* implicit f */
         ek_y[m_pivots.size()] = 1; /* implicit f */
@@ -86,7 +88,7 @@ struct solver
         /* Compute new fk */
         for (size_t i = 0; i < m_pivots.size() + 1; ++i)
             for (size_t j = 0; j < m_pivots.size() + 1; ++j)
-                m_ek[i][j] -= ek_y[i] * ek_x[j] * dk;
+                m_ek[j][i] -= ek_y[i] * ek_x[j] * dk;
 
         /* Register new pivot */
         m_pivots.push_back(best_pivot);
@@ -112,8 +114,8 @@ struct solver
         /* Then, the f(x_i,y)*f(x,y_j) parts */
         for (size_t i = 0; i < m_pivots.size(); ++i)
             for (size_t j = 0; j < m_pivots.size(); ++j)
-                if (m_ek[i][j])
-                    ret += m_ek[i][j] * eval_f(m_pivots[i].x, y) * eval_f(x, m_pivots[j].y);
+                if (m_ek[j][i])
+                    ret += m_ek[j][i] * eval_f(m_pivots[i].x, y) * eval_f(x, m_pivots[j].y);
 
         return ret;
     }
@@ -163,10 +165,8 @@ private:
     std::vector<real2> m_pivots;
 };
 
-int main(int argc, char **argv)
+int main()
 {
-    UNUSED(argc, argv);
-
     int const grid_size = 33;
     int const iters = 6;
 

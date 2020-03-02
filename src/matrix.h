@@ -14,34 +14,72 @@
 
 using namespace lol;
 
+#include <cassert>
+
 /*
  * Arbitrarily-sized square matrices; for now this only supports
  * naive inversion and is used for the Remez inversion method.
  */
 
 template<typename T>
+class array2d
+{
+public:
+    array2d() = default;
+
+    array2d(size_t cols, size_t rows)
+    {
+        resize(cols, rows);
+    }
+
+    void resize(size_t cols, size_t rows)
+    {
+        m_data.resize(cols * rows);
+        m_cols = cols;
+        m_rows = rows;
+    }
+
+    size_t cols() const { return m_cols; }
+    size_t rows() const { return m_rows; }
+
+    T *operator[](size_t line)
+    {
+        return &m_data[line * m_cols];
+    }
+
+    T const *operator[](size_t line) const
+    {
+        return &m_data[line * m_cols];
+    }
+
+private:
+    std::vector<T> m_data;
+    size_t m_cols = 0;
+    size_t m_rows = 0;
+};
+
+template<typename T>
 struct linear_system : public array2d<T>
 {
-    inline linear_system<T>(int cols)
+    inline linear_system<T>(size_t n)
     {
-        ASSERT(cols > 0);
-
-        this->resize(ivec2(cols));
+        assert(n > 0);
+        this->resize(n, n);
     }
 
     void init(T const &x)
     {
-        int const n = this->size().x;
+        auto n = this->cols();
 
         for (int j = 0; j < n; j++)
             for (int i = 0; i < n; i++)
-                (*this)[i][j] = (i == j) ? x : (T)0;
+                (*this)[j][i] = (i == j) ? x : (T)0;
     }
 
     /* Naive matrix inversion */
     linear_system<T> inverse() const
     {
-        int const n = this->size().x;
+        auto n = this->cols();
         linear_system a(*this), b(n);
 
         b.init((T)1);
@@ -56,13 +94,13 @@ struct linear_system : public array2d<T>
             {
                 for (int j = i + 1; j < n; j++)
                 {
-                    if (!a[i][j])
+                    if (!a[j][i])
                         continue;
                     /* Add row j to row i */
                     for (int k = 0; k < n; k++)
                     {
-                        a[k][i] += a[k][j];
-                        b[k][i] += b[k][j];
+                        a[i][k] += a[j][k];
+                        b[i][k] += b[j][k];
                     }
                     break;
                 }
@@ -75,19 +113,19 @@ struct linear_system : public array2d<T>
             {
                 if (j == i)
                     continue;
-                T mul = x * a[i][j];
+                T mul = x * a[j][i];
                 for (int k = 0; k < n; k++)
                 {
-                    a[k][j] -= mul * a[k][i];
-                    b[k][j] -= mul * b[k][i];
+                    a[j][k] -= mul * a[i][k];
+                    b[j][k] -= mul * b[i][k];
                 }
             }
 
             /* Finally, ensure the diagonal term is 1 */
             for (int k = 0; k < n; k++)
             {
-                a[k][i] *= x;
-                b[k][i] *= x;
+                a[i][k] *= x;
+                b[i][k] *= x;
             }
         }
 
