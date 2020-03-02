@@ -1,9 +1,10 @@
 
-EXTRA_DIST = $(lol_headers) bootstrap README.md \
-             .travis.yml lolremez.sln build.config \
-             .gitignore .gitattributes .gitmodules
+lol_files := $(filter %.h %.ipp %.hpp, $(shell find $(srcdir)/lol/include -type f))
+git_files = .gitignore .gitattributes .gitmodules
+vs_files = lolremez.sln Directory.Build.props
 
-lol_headers := $(filter %.h %.ipp %.hpp, $(shell find $(srcdir)/lol/include -type f))
+EXTRA_DIST = bootstrap README.md .travis.yml \
+             $(lol_files) $(git_files) $(vs_files)
 
 SUBDIRS = src
 

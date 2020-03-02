@@ -469,7 +469,7 @@ struct expression::action<expression::r_sup_float>
             }
         }
 
-        that->m_ops.push_back(std::make_tuple(id::constant, that->m_constants.size()));
+        that->m_ops.push_back(std::make_tuple(id::constant, (int)that->m_constants.size()));
         that->m_constants.push_back(val);
         that->m_ops.push_back(std::make_tuple(id::pow, -1));
     }
@@ -487,7 +487,7 @@ struct expression::action<expression::r_name>
             that->m_ops.push_back(std::make_tuple(id::y, -1));
         else
         {
-            that->m_ops.push_back(std::make_tuple(id::constant, that->m_constants.size()));
+            that->m_ops.push_back(std::make_tuple(id::constant, (int)that->m_constants.size()));
             if (in.string() == "e")
                 that->m_constants.push_back(lol::real::R_E());
             else if (in.string() == "pi" || in.string() == "π")

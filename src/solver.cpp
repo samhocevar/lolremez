@@ -218,10 +218,7 @@ void remez_solver::remez_step()
         error += system[m_order + 1][i] * fxn[i];
 
     if (show_stats)
-    {
-        using std::printf;
-        printf(" -:- timing for inversion: %f ms\n", t.get() * 1000.f);
-    }
+        std::cout << " -:- timing for inversion: " << (t.get() * 1000.f) << " ms\n";
 }
 
 /*
@@ -272,10 +269,7 @@ void remez_solver::find_zeros()
     }
 
     if (show_stats)
-    {
-        using std::printf;
-        printf(" -:- timing for zeros: %f ms\n", t.get() * 1000.f);
-    }
+        std::cout << " -:- timing for zeros: " << (t.get() * 1000.f) << " ms\n";
 }
 
 

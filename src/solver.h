@@ -19,8 +19,10 @@
 
 #include <lol/base/thread.h>
 #include <lol/math/polynomial.h>
+#include <lol/types/real.h>
 
-#include <cstdio>
+#include <vector>
+#include <array>
 
 #include "expression.h"
 

@@ -61,7 +61,7 @@ private:
 template<typename T>
 struct linear_system : public array2d<T>
 {
-    inline linear_system<T>(int n)
+    inline linear_system<T>(size_t n)
     {
         assert(n > 0);
         this->resize(n, n);
