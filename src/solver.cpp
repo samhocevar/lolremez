@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2019 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2020 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -18,10 +18,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include <lol/base/thread.h>
-#include <lol/types/real.h>
-#include <lol/math/polynomial.h>
-#include <lol/math/rand.h>
+#include <lol/thread>
+#include <lol/real>
+#include <lol/math>
 
 #include "matrix.h"
 #include "solver.h"
@@ -380,7 +379,7 @@ void remez_solver::worker_thread()
 
 #if 0
             /* This (regula falsi) is actually really slow */
-            real s = abs(b.err) / (abs(a.err) + abs(b.err));
+            real s = fabs(b.err) / (fabs(a.err) + fabs(b.err));
             real newc = b.x + s * (a.x - b.x);
 
             /* If the third point didn't change since last iteration,

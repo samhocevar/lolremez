@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2019 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005—2020 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -18,9 +18,9 @@
 #include <iostream>
 #include <iomanip>
 
-#include <lol/base/utils.h>
-#include <lol/base/getopt.h>
-#include <lol/types/real.h>
+#include <lol/utils>
+#include <lol/getopt>
+#include <lol/real>
 
 #include "solver.h"
 #include "expression.h"
