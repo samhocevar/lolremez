@@ -17,6 +17,7 @@
 #include <float.h>
 #include <iostream>
 #include <iomanip>
+#include <optional> // std::optional
 
 #include <lol/utils>
 #include <lol/cli>
@@ -27,26 +28,37 @@
 
 using lol::real;
 
-static void bugs()
-{
-    std::cout
-        << "Written by Sam Hocevar. Report bugs to <sam@hocevar.net> or to the\n"
-        << "issue page: https://github.com/samhocevar/lolremez/issues\n";
-}
+static std::string copyright =
+    "Copyright © 2005—2020 Sam Hocevar <sam@hocevar.net>\n"
+    "This program is free software. It comes without any warranty, to the extent\n"
+    "permitted by applicable law. You can redistribute it and/or modify it under\n"
+    "the terms of the Do What the Fuck You Want to Public License, Version 2, as\n"
+    "published by the WTFPL Task Force. See http://www.wtfpl.net/ for more details.\n";
 
+static std::string footer =
+    "\n"
+    "Examples:\n"
+    "  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\"\n"
+    "  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\" \"exp(1+x)\"\n"
+    "\n"
+    "Tutorial available on https://github.com/samhocevar/lolremez/wiki\n";
+
+static std::string bugs =
+    "\n"
+    "Written by Sam Hocevar. Report bugs to <sam@hocevar.net> or to the\n"
+    "issue page: https://github.com/samhocevar/lolremez/issues\n";
+
+// FIXME: improve --version output by mayne reusing this function
 static void version()
 {
     std::cout
         << "lolremez " << PACKAGE_VERSION << "\n"
-        << "Copyright © 2005—2020 Sam Hocevar <sam@hocevar.net>\n"
-        << "This program is free software. It comes without any warranty, to the extent\n"
-        << "permitted by applicable law. You can redistribute it and/or modify it under\n"
-        << "the terms of the Do What the Fuck You Want to Public License, Version 2, as\n"
-        << "published by the WTFPL Task Force. See http://www.wtfpl.net/ for more details.\n"
-        << "\n";
-    bugs();
+        << "\n"
+        << copyright
+        << bugs;
 }
 
+// FIXME: improve --help output by mayne adding some messages
 static void usage()
 {
     std::cout
@@ -63,13 +75,8 @@ static void usage()
         << "      --stats                print timing statistics\n"
         << "  -h, --help                 display this help and exit\n"
         << "  -V, --version              output version information and exit\n"
-        << "\n"
-        << "Examples:\n"
-        << "  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\"\n"
-        << "  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\" \"exp(1+x)\"\n"
-        << "\n"
-        << "Tutorial available on https://github.com/samhocevar/lolremez/wiki\n";
-    bugs();
+        << footer
+        << bugs;
 }
 
 static void FAIL(char const *message = nullptr, ...)
@@ -87,7 +94,7 @@ static void FAIL(char const *message = nullptr, ...)
     exit(EXIT_FAILURE);
 }
 
-/* See the tutorial at http://lolengine.net/wiki/doc/maths/remez */
+// See the tutorial at http://lolengine.net/wiki/doc/maths/remez
 int main(int argc, char **argv)
 {
     std::string str_xmin("-1"), str_xmax("1");
@@ -101,90 +108,60 @@ int main(int argc, char **argv)
     }
     mode = mode_default;
 
-    bool has_degree = false, has_range = false, has_bits = false;
-    bool show_help = false;
     bool show_stats = false;
     bool show_progress = false;
     bool show_debug = false;
 
-    std::string expr, error;
-    std::string range;
-    int degree = -1;
-    int bits = -1;
+    std::string expr;
+    std::optional<std::string> error, range;
+    std::optional<int> degree;
+    std::optional<int> bits;
 
     remez_solver solver;
 
-    auto help = lol::cli::required("-h", "--help").set(show_help, true)
-              % "display this help and exit";
+    lol::cli::app opts("lolremez");
+    opts.set_version_flag("-V,--version", PACKAGE_VERSION);
+    opts.footer(footer + bugs);
 
-    auto version = lol::cli::required("-V", "--version").call([]()
-                       { ::version(); exit(EXIT_SUCCESS); })
-                 % "output version information and exit";
+    // Approximation parameters
+    opts.add_option("-d,--degree", degree, "degree of final polynomial")->type_name("<int>");
+    opts.add_option("-r,--range", range, "range over which to approximate")->type_name("<xmin>:<xmax>");
+    // Precision parameters
+    opts.add_option("-p,--precision", bits, "floating-point precision (default 512)")->type_name("<int>");
+    opts.add_flag("--float", [&](int64_t) { mode = mode_float; }, "use float type");
+    opts.add_flag("--double", [&](int64_t) { mode = mode_double; }, "use double type");
+    opts.add_flag("--long-double", [&](int64_t) { mode = mode_long_double; }, "use long double type");
+    // Runtime flags
+    opts.add_flag("--progress", show_progress, "print progress");
+    opts.add_flag("--stats", show_stats, "print timing statistics");
+    opts.add_flag("--debug", show_debug, "print debug messages");
+    // Expression to evaluate and optional error expression
+    opts.add_option("expression", expr)->type_name("<x-expression>")->required();
+    opts.add_option("error", error)->type_name("<x-expression>");
 
-    auto run =
-    (
-        // Approximation parameters
-        lol::cli::option("-d", "--degree")
-            & lol::cli::integer("degree", degree).set(has_degree, true)
-            % "degree of final polynomial",
-        lol::cli::option("-r", "--range")
-            & lol::cli::value("xmin>:<xmax", range).set(has_range, true)
-            % "range over which to approximate",
-        // Precision parameters
-        lol::cli::option("-p", "--precision")
-            & lol::cli::integer("bits", bits).set(has_bits, true)
-            % "floating-point precision (default 512)",
-        ( lol::cli::option("--float").set(mode, mode_float) |
-          lol::cli::option("--double").set(mode, mode_double) |
-          lol::cli::option("--long-double").set(mode, mode_long_double) ),
-        // Runtime flags
-        lol::cli::option("--progress").set(show_progress, true) % "print progress",
-        lol::cli::option("--stats").set(show_stats, true) % "print timing statistics",
-        lol::cli::option("--debug").set(show_debug, true),
-        // Expression to evaluate and optional error expression
-        lol::cli::value("x-expression").set(expr),
-        lol::cli::opt_value("x-error").set(error)
-    );
+    CLI11_PARSE(opts, argc, argv);
 
-    auto success = lol::cli::parse(argc, argv, run | help | version);
-
-    if (!success || show_help)
+    if (degree)
     {
-        // clipp::documentation is not good enough yet; I would like the
-        // following formatting:
-        //
-        //    -p, --precision <bits>     floating-point precision (default 512)
-        //        --progress             print progress
-        //
-        // But I actually get:
-        //
-        //         <bits>      floating-point precision (default 512)
-        //         --progress  print progress
-        usage();
-        return success ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-
-    if (has_degree)
-    {
-        if (degree < 1)
+        if (*degree < 1)
             FAIL("invalid degree: must be at least 1");
-        solver.set_order(degree);
+        solver.set_order(*degree);
     }
 
-    if (has_range)
+    if (range)
     {
-        auto arg = lol::split(std::string(range), ':');
+        auto arg = lol::split(*range, ':');
         if (arg.size() != 2)
             FAIL("invalid range");
         str_xmin = arg[0];
         str_xmax = arg[1];
     }
 
-    if (has_bits)
+    if (bits)
     {
-        if (bits < 32 || bits > 65535)
-            FAIL("invalid precision %d", bits);
-        real::global_bigit_count((bits + 31) / 32);
+        if (*bits < 32 || *bits > 65535)
+            FAIL("invalid precision %d", *bits);
+        real::global_bigit_count((*bits + 31) / 32);
     }
 
     // Initialise solver: ranges
@@ -220,10 +197,10 @@ int main(int argc, char **argv)
 
     solver.set_func(ex);
 
-    if (error.length())
+    if (error)
     {
-        if (!ex.parse(error))
-            FAIL("invalid weight function: %s", error.c_str());
+        if (!ex.parse(*error))
+            FAIL("invalid weight function: %s", error->c_str());
 
         solver.set_weight(ex);
     }
@@ -241,7 +218,7 @@ int main(int argc, char **argv)
     for (int iteration = 0; ; ++iteration)
     {
         fprintf(stderr, "Iteration: %d\r", iteration);
-        fflush(stderr); /* Required on Windows because stderr is buffered. */
+        fflush(stderr); // Required on Windows because stderr is buffered.
         if (!solver.do_step())
             break;
 
@@ -268,8 +245,8 @@ int main(int argc, char **argv)
     char const *type = mode == mode_float ? "float" :
                        mode == mode_double ? "double" : "long double";
     std::cout << "// Approximation of f(x) = " << expr << '\n';
-    if (error.length())
-        std::cout << "// with weight function g(x) = " << error << '\n';
+    if (error)
+        std::cout << "// with weight function g(x) = " << *error << '\n';
     std::cout << "// on interval [ " << str_xmin << ", " << str_xmax << " ]\n";
     std::cout << "// with a polynomial of degree " << p.degree() << ".\n";
 

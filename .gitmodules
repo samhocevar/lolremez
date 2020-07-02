@@ -1,4 +1,5 @@
 [submodule "lol"]
 	path = lol
-	url = ../../lolengine/lol.git
-	branch = core
+	url = https://github.com/lolengine/lol.git
+	branch = master
+	update = merge
