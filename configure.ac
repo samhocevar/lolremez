@@ -2,7 +2,7 @@ dnl
 dnl  Configure script for a Lol Engine project
 dnl
 
-AC_INIT(lolremez, 0.6)
+AC_INIT(lolremez, 0.7)
 
 dnl
 dnl  Standard autoconf setup and tools requirements

@@ -98,6 +98,11 @@ installation location, or run the following:
 
 ## Changes
 
+### News for LolRemez 0.7:
+
+ - Fix a problem making hyperbolic functions unavailable.
+ - A Windows build is provided with the release.
+
 ### News for LolRemez 0.6:
 
  - Fix a grave problem with extrema finding when using a weight function;
