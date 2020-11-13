@@ -377,18 +377,28 @@ void remez_solver::worker_thread()
             point &b = m_zeros_state[i][1];
             point &c = m_zeros_state[i][2];
 
-#if 0
-            /* This (regula falsi) is actually really slow */
-            real s = fabs(b.err) / (fabs(a.err) + fabs(b.err));
-            real newc = b.x + s * (a.x - b.x);
+#if 1
+            /* Unmodified regula falsi is very slow
+             * A few variations are listed here*/
+            c.x = a.x - a.err*(b.x - a.x)/(b.err - a.err);
 
-            /* If the third point didn't change since last iteration,
-             * we may be at an inflection point. Use the midpoint to get
-             * out of this situation. */
-            c.x = newc != c.x ? newc : (a.x + b.x) / 2;
+            c.err = eval_estimate(c.x) - eval_func(c.x);
+
+            if ((b.err < zero && c.err < zero)
+                 || (b.err > zero && c.err > zero))
+                /* Illinois algorithm */
+                //a.err /= 2; //Illinois algorithm
+
+                /* Pegasus algorithm of doi:10.1007/BF01932959 */
+                a.err *= b.err/(b.err + c.err);
+
+                /* Method 4 of doi:10.1.1.53.8676 */
+                //a.err *= (real)1 - c.err/b.err - c.err/a.err;
+            else
+                a = b;
+            b = c;
 #else
             c.x = (a.x + b.x) / 2;
-#endif
             c.err = eval_estimate(c.x) - eval_func(c.x);
 
             if ((a.err < zero && c.err < zero)
@@ -396,6 +406,7 @@ void remez_solver::worker_thread()
                 a = c;
             else
                 b = c;
+#endif
 
             m_answers.push(i);
         }
