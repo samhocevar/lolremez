@@ -389,10 +389,10 @@ void remez_solver::worker_thread()
                 /* Illinois algorithm */
                 //a.err /= 2; //Illinois algorithm
 
-                /* Pegasus algorithm of doi:10.1007/BF01932959 */
+                /* Pegasus algorithm of doi:10.1007/BF01932959 by M. Dowell and P. Jarratt*/
                 a.err *= b.err/(b.err + c.err);
 
-                /* Method 4 of citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.8676 */
+                /* Method 4 of citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.8676 by J. A. Ford*/
                 //a.err *= (real)1 - c.err/b.err - c.err/a.err;
             else
                 a = b;
