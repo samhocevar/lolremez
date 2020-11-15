@@ -232,8 +232,6 @@ void remez_solver::find_zeros()
 {
     timer t;
 
-    static real const zero = real("0");
-
     /* Initialise an [a,b] bracket for each zero we try to find */
     for (int i = 0; i < m_order + 1; i++)
     {
@@ -257,7 +255,7 @@ void remez_solver::find_zeros()
         point const &b = m_zeros_state[i][1];
         point const &c = m_zeros_state[i][2];
 
-        if (c.err == zero || fabs(a.x - b.x) <= m_epsilon)
+        if (c.err.is_zero() || fabs(a.x - b.x) <= m_epsilon)
         {
             m_zeros[i] = c.x;
             ++finished;
@@ -358,10 +356,13 @@ real remez_solver::eval_error(real const &x)
     return fabs((eval_estimate(x) - eval_func(x)) / eval_weight(x));
 }
 
+static bool have_same_sign(real const &x, real const &y)
+{
+    return x.is_negative() == y.is_negative() && !x.is_zero() && !y.is_zero();
+}
+
 void remez_solver::worker_thread()
 {
-    static real const zero = (real)0;
-
     for (;;)
     {
         int i = m_questions.pop();
@@ -380,20 +381,21 @@ void remez_solver::worker_thread()
 #if 1
             /* Unmodified regula falsi is very slow
              * A few variations are listed here*/
-            c.x = a.x - a.err*(b.x - a.x)/(b.err - a.err);
+            c.x = a.x - a.err * (b.x - a.x) / (b.err - a.err);
 
             c.err = eval_estimate(c.x) - eval_func(c.x);
 
-            if ((b.err < zero && c.err < zero)
-                 || (b.err > zero && c.err > zero))
+            if (have_same_sign(b.err, c.err))
+            {
                 /* Illinois algorithm */
                 //a.err /= 2; //Illinois algorithm
 
                 /* Pegasus algorithm of doi:10.1007/BF01932959 by M. Dowell and P. Jarratt*/
-                a.err *= b.err/(b.err + c.err);
+                a.err *= b.err / (b.err + c.err);
 
                 /* Method 4 of citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.8676 by J. A. Ford*/
-                //a.err *= (real)1 - c.err/b.err - c.err/a.err;
+                //a.err *= (real)1 - c.err / b.err - c.err / a.err;
+            }
             else
                 a = b;
             b = c;
@@ -401,11 +403,7 @@ void remez_solver::worker_thread()
             c.x = (a.x + b.x) / 2;
             c.err = eval_estimate(c.x) - eval_func(c.x);
 
-            if ((a.err < zero && c.err < zero)
-                 || (a.err > zero && c.err > zero))
-                a = c;
-            else
-                b = c;
+            (have_same_sign(a.err, c.err) ? a : b) = c;
 #endif
 
             m_answers.push(i);
