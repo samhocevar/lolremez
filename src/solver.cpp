@@ -78,6 +78,11 @@ void remez_solver::set_weight(expression const &expr)
     m_weight = expr;
 }
 
+void remez_solver::set_root_finder(root_finder rf)
+{
+    m_rf = rf;
+}
+
 void remez_solver::do_init()
 {
     m_k1 = (m_xmax + m_xmin) / 2;
@@ -237,11 +242,13 @@ void remez_solver::find_zeros()
     {
         point &a = m_zeros_state[i][0];
         point &b = m_zeros_state[i][1];
+        point &c = m_zeros_state[i][1];
 
         a.x = m_control[i];
         a.err = eval_estimate(a.x) - eval_func(a.x);
         b.x = m_control[i + 1];
         b.err = eval_estimate(b.x) - eval_func(b.x);
+        c.err = 0;
 
         m_questions.push(i);
     }
@@ -356,11 +363,6 @@ real remez_solver::eval_error(real const &x)
     return fabs((eval_estimate(x) - eval_func(x)) / eval_weight(x));
 }
 
-static bool have_same_sign(real const &x, real const &y)
-{
-    return x.is_negative() == y.is_negative() && !x.is_zero() && !y.is_zero();
-}
-
 void remez_solver::worker_thread()
 {
     for (;;)
@@ -378,33 +380,44 @@ void remez_solver::worker_thread()
             point &b = m_zeros_state[i][1];
             point &c = m_zeros_state[i][2];
 
-#if 1
-            /* Unmodified regula falsi is very slow
-             * A few variations are listed here*/
-            c.x = a.x - a.err * (b.x - a.x) / (b.err - a.err);
+            int old_c_err_sign = sign(c.err);
 
-            c.err = eval_estimate(c.x) - eval_func(c.x);
-
-            if (have_same_sign(b.err, c.err))
-            {
-                /* Illinois algorithm */
-                //a.err /= 2; //Illinois algorithm
-
-                /* Pegasus algorithm of doi:10.1007/BF01932959 by M. Dowell and P. Jarratt*/
-                a.err *= b.err / (b.err + c.err);
-
-                /* Method 4 of citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.8676 by J. A. Ford*/
-                //a.err *= (real)1 - c.err / b.err - c.err / a.err;
-            }
+            // Bisect method uses the midpoint, other methods use the “false
+            // position”: regula falsi (slow) and some improved versions.
+            if (m_rf == root_finder::bisect)
+                c.x = (a.x + b.x) / 2;
             else
-                a = b;
-            b = c;
-#else
-            c.x = (a.x + b.x) / 2;
+                c.x = a.x - a.err * (b.x - a.x) / (b.err - a.err);
             c.err = eval_estimate(c.x) - eval_func(c.x);
 
-            (have_same_sign(a.err, c.err) ? a : b) = c;
-#endif
+            // pd is the point with a different error sign from c, ps has same sign
+            point *pd = &a, *ps = &b;
+            if (sign(a.err) * sign(c.err) > 0)
+                std::swap(pd, ps);
+
+            // Regula falsi variations tweak a.err or b.err for the next iteration
+            // when the computed error has the same sign as the last time.
+            if (sign(c.err) * old_c_err_sign > 0)
+            {
+                switch (m_rf)
+                {
+                case root_finder::illinois:
+                    // Illinois algorithm
+                    pd->err /= 2;
+                    break;
+                case root_finder::pegasus:
+                    // Pegasus algorithm from doi:10.1007/BF01932959 by M. Dowell and P. Jarratt
+                    pd->err *= ps->err / (ps->err + c.err);
+                    break;
+                case root_finder::ford:
+                    // Method 4 of https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.8676 by J. A. Ford
+                    pd->err *= (real)1 - c.err / ps->err - c.err / pd->err;
+                    break;
+                }
+            }
+
+            // Either a or b becomes c
+            *ps = c;
 
             m_answers.push(i);
         }
