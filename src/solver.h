@@ -26,6 +26,15 @@
 
 #include "expression.h"
 
+enum class root_finder
+{
+    bisect,
+    regula_falsi,
+    illinois,
+    pegasus,
+    ford,
+};
+
 class remez_solver
 {
 public:
@@ -43,6 +52,7 @@ public:
     void set_range(lol::real xmin, lol::real xmax);
     void set_func(expression const &expr);
     void set_weight(expression const &expr);
+    void set_root_finder(root_finder rf);
 
     void do_init();
     bool do_step();
@@ -74,6 +84,7 @@ private:
     int m_order = 4;
     int m_digits = 40;
     bool m_has_weight = false;
+    root_finder m_rf = root_finder::pegasus;
 
     /* Solver state */
     lol::polynomial<lol::real> m_estimate;

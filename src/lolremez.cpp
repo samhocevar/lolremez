@@ -48,7 +48,7 @@ static std::string bugs =
     "Written by Sam Hocevar. Report bugs to <sam@hocevar.net> or to the\n"
     "issue page: https://github.com/samhocevar/lolremez/issues\n";
 
-// FIXME: improve --version output by mayne reusing this function
+// FIXME: improve --version output by maybe reusing this function
 static void version()
 {
     std::cout
@@ -107,6 +107,7 @@ int main(int argc, char **argv)
         mode_default = mode_double,
     }
     mode = mode_default;
+    root_finder rf = root_finder::pegasus;
 
     bool show_stats = false;
     bool show_progress = false;
@@ -131,6 +132,11 @@ int main(int argc, char **argv)
     opts.add_flag("--float", [&](int64_t) { mode = mode_float; }, "use float type");
     opts.add_flag("--double", [&](int64_t) { mode = mode_double; }, "use double type");
     opts.add_flag("--long-double", [&](int64_t) { mode = mode_long_double; }, "use long double type");
+    opts.add_flag("--bisect", [&](int64_t) { rf = root_finder::bisect; }, "use bisection for root finding");
+    opts.add_flag("--regula-falsi", [&](int64_t) { rf = root_finder::regula_falsi; }, "use regula falsi for root finding");
+    opts.add_flag("--illinois", [&](int64_t) { rf = root_finder::illinois; }, "use Illinois algorithm for root finding");
+    opts.add_flag("--pegasus", [&](int64_t) { rf = root_finder::pegasus; }, "use Pegasus algorithm for root finding (default)");
+    opts.add_flag("--ford", [&](int64_t) { rf = root_finder::ford; }, "use Ford algorithm for root finding");
     // Runtime flags
     opts.add_flag("--progress", show_progress, "print progress");
     opts.add_flag("--stats", show_stats, "print timing statistics");
@@ -209,6 +215,7 @@ int main(int argc, char **argv)
     int digits = mode == mode_float ? FLT_DIG + 2 :
                  mode == mode_double ? DBL_DIG + 2 : LDBL_DIG + 2;
     solver.set_digits(digits);
+    solver.set_root_finder(rf);
 
     solver.show_stats = show_stats;
     solver.show_debug = show_debug;
