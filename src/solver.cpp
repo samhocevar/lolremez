@@ -283,12 +283,11 @@ void remez_solver::find_zeros()
 //
 // If the weight function is 1, we would only need to compute m_order extrema
 // because we already know that -1 and +1 are extrema. However when weighing
-// the error the extrema get slightly moved around.
+// the error the exact extrema locations get slightly moved around.
 //
 // The algorithm used here is successive parabolic interpolation. FIXME: we
 // could use Brent’s method instead, which combines parabolic interpolation
-// and golden ratio search and has superlinear convergence. However, the
-// real bottleneck for now is the root finding, so this has low priority.
+// and golden ratio search and has superlinear convergence.
 void remez_solver::find_extrema()
 {
     timer t;
@@ -363,6 +362,8 @@ real remez_solver::eval_error(real const &x)
     return fabs((eval_estimate(x) - eval_func(x)) / eval_weight(x));
 }
 
+// Worker threads handle jobs from the main thread, computing either a root finding step
+// or an extrema finding iteration step.
 void remez_solver::worker_thread()
 {
     for (;;)
@@ -376,14 +377,15 @@ void remez_solver::worker_thread()
         }
         else if (i < 1000)
         {
+            // Root finding step
             point &a = m_zeros_state[i][0];
             point &b = m_zeros_state[i][1];
             point &c = m_zeros_state[i][2];
 
-            int old_c_err_sign = sign(c.err);
+            auto old_c_err = c.err;
 
-            // Bisect method uses the midpoint, other methods use the “false
-            // position”: regula falsi (slow) and some improved versions.
+            // Bisect method uses the midpoint. Other methods such as regula falsi (slow) and
+            // some improved versions use the “false position”.
             if (m_rf == root_finder::bisect)
                 c.x = (a.x + b.x) / 2;
             else
@@ -397,7 +399,7 @@ void remez_solver::worker_thread()
 
             // Regula falsi variations tweak a.err or b.err for the next iteration
             // when the computed error has the same sign as the last time.
-            if (sign(c.err) * old_c_err_sign > 0)
+            if (sign(c.err) * sign(old_c_err) > 0)
             {
                 switch (m_rf)
                 {
@@ -406,12 +408,15 @@ void remez_solver::worker_thread()
                     pd->err /= 2;
                     break;
                 case root_finder::pegasus:
-                    // Pegasus algorithm from doi:10.1007/BF01932959 by M. Dowell and P. Jarratt
-                    pd->err *= ps->err / (ps->err + c.err);
+                    // Pegasus algorithm from doi:10.1007/BF01932959 by M. Dowell and P. Jarratt.
+                    // “The philosophy of the method is to scale down the value fi-1 by the factor
+                    // fi/(fi+fi+1) […]”.
+                    pd->err *= old_c_err / (old_c_err + c.err);
                     break;
                 case root_finder::ford:
-                    // Method 4 of https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.8676 by J. A. Ford
-                    pd->err *= (real)1 - c.err / ps->err - c.err / pd->err;
+                    // Method 4 of https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.8676
+                    // by J. A. Ford
+                    pd->err *= real::R_1() - c.err / ps->err - c.err / pd->err;
                     break;
                 }
             }
@@ -423,6 +428,7 @@ void remez_solver::worker_thread()
         }
         else if (i < 2000)
         {
+            // Extrema finding step
             i -= 1000;
 
             point &a = m_extrema_state[i][0];
