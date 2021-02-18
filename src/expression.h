@@ -23,6 +23,7 @@
 
 #include <lol/pegtl>
 #include <vector>
+#include <map>
 #include <tuple>
 #include <cassert>
 
@@ -162,6 +163,7 @@ struct expression
     }
 
 private:
+    id m_current_op;
     std::vector<std::tuple<id, int>> m_ops;
     std::vector<lol::real> m_constants;
 
@@ -400,44 +402,47 @@ struct expression::action<expression::r_binary_call>
 };
 
 template<>
+struct expression::action<expression::r_unary_fun>
+{
+    template<typename INPUT>
+    static void apply(INPUT const &in, expression *that)
+    {
+        static std::map<std::string, id> lut =
+        {
+            { "abs",   id::abs },
+            { "sqrt",  id::sqrt },
+            { "cbrt",  id::cbrt },
+            { "exp",   id::exp },
+            { "exp2",  id::exp2 },
+            { "erf",   id::erf },
+            { "log10", id::log10 },
+            { "log2",  id::log2 },
+            { "log",   id::log },
+            { "sinh",  id::sinh },
+            { "cosh",  id::cosh },
+            { "tanh",  id::tanh },
+            { "sin",   id::sin },
+            { "cos",   id::cos },
+            { "tan",   id::tan },
+            { "asin",  id::asin },
+            { "acos",  id::acos },
+            { "atan",  id::atan },
+            { "float",   id::tofloat },
+            { "double",  id::todouble },
+            { "ldouble", id::toldouble },
+        };
+
+        that->m_current_op = lut[in.string()];
+    }
+};
+
+template<>
 struct expression::action<expression::r_unary_call>
 {
     template<typename INPUT>
     static void apply(INPUT const &in, expression *that)
     {
-        struct { id ret; char const *name; } lut[] =
-        {
-            { id::abs,   "abs" },
-            { id::sqrt,  "sqrt" },
-            { id::cbrt,  "cbrt" },
-            { id::exp,   "exp" },
-            { id::exp2,  "exp2" },
-            { id::erf,   "erf" },
-            { id::log10, "log10" },
-            { id::log2,  "log2" },
-            { id::log,   "log" },
-            { id::sinh,  "sinh" },
-            { id::cosh,  "cosh" },
-            { id::tanh,  "tanh" },
-            { id::sin,   "sin" },
-            { id::cos,   "cos" },
-            { id::tan,   "tan" },
-            { id::asin,  "asin" },
-            { id::acos,  "acos" },
-            { id::atan,  "atan" },
-            { id::tofloat,   "float" },
-            { id::todouble,  "double" },
-            { id::toldouble, "ldouble" },
-        };
-
-        for (auto pair : lut)
-        {
-            if (strncmp(in.string().c_str(), pair.name, strlen(pair.name)) != 0)
-                continue;
-
-            that->m_ops.push_back(std::make_tuple(pair.ret, -1));
-            return;
-        }
+        that->m_ops.push_back(std::make_tuple(that->m_current_op, -1));
     }
 };
 
