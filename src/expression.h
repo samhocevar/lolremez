@@ -163,7 +163,7 @@ struct expression
     }
 
 private:
-    id m_current_op;
+    std::vector<id> m_temp_op;
     std::vector<std::tuple<id, int>> m_ops;
     std::vector<lol::real> m_constants;
 
@@ -432,7 +432,7 @@ struct expression::action<expression::r_unary_fun>
             { "ldouble", id::toldouble },
         };
 
-        that->m_current_op = lut[in.string()];
+        that->m_temp_op.push_back(lut[in.string()]);
     }
 };
 
@@ -442,7 +442,8 @@ struct expression::action<expression::r_unary_call>
     template<typename INPUT>
     static void apply(INPUT const &in, expression *that)
     {
-        that->m_ops.push_back(std::make_tuple(that->m_current_op, -1));
+        that->m_ops.push_back(std::make_tuple(that->m_temp_op.back(), -1));
+        that->m_temp_op.pop_back();
     }
 };
 
