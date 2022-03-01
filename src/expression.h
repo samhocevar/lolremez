@@ -41,7 +41,7 @@ enum class id : uint8_t
     /* Unary functions/operators */
     plus, minus, abs,
     sqrt, cbrt,
-    exp, exp2, erf, log, log2, log10,
+    exp, expm1, exp2, erf, log, log1p, log2, log10,
     sin, cos, tan,
     asin, acos, atan,
     sinh, cosh, tanh,
@@ -107,9 +107,11 @@ struct expression
             case id::sqrt:  push_val(sqrt(head));  break;
             case id::cbrt:  push_val(cbrt(head));  break;
             case id::exp:   push_val(exp(head));   break;
+            case id::expm1: push_val(expm1(head)); break;
             case id::exp2:  push_val(exp2(head));  break;
             case id::erf:   push_val(erf(head));   break;
             case id::log:   push_val(log(head));   break;
+            case id::log1p: push_val(log1p(head)); break;
             case id::log2:  push_val(log2(head));  break;
             case id::log10: push_val(log10(head)); break;
             case id::sin:   push_val(sin(head));   break;
@@ -240,10 +242,12 @@ private:
                              TAO_PEGTL_STRING("sin"),
                              TAO_PEGTL_STRING("log2"),
                              TAO_PEGTL_STRING("log10"),
+                             TAO_PEGTL_STRING("log1p"),
                              TAO_PEGTL_STRING("log"),
                              TAO_PEGTL_STRING("ldouble"),
                              TAO_PEGTL_STRING("float"),
                              TAO_PEGTL_STRING("exp2"),
+                             TAO_PEGTL_STRING("expm1"),
                              TAO_PEGTL_STRING("exp"),
                              TAO_PEGTL_STRING("erf"),
                              TAO_PEGTL_STRING("double"),
@@ -413,9 +417,11 @@ struct expression::action<expression::r_unary_fun>
             { "sqrt",  id::sqrt },
             { "cbrt",  id::cbrt },
             { "exp",   id::exp },
+            { "expm1", id::expm1 },
             { "exp2",  id::exp2 },
             { "erf",   id::erf },
             { "log10", id::log10 },
+            { "log1p", id::log1p },
             { "log2",  id::log2 },
             { "log",   id::log },
             { "sinh",  id::sinh },
