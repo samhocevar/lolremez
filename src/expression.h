@@ -41,7 +41,8 @@ enum class id : uint8_t
     /* Unary functions/operators */
     plus, minus, abs,
     sqrt, cbrt,
-    exp, expm1, exp2, erf, log, log1p, log2, log10,
+    exp, expm1, exp2, erf, erfc,
+    log, log1p, log2, log10,
     sin, cos, tan,
     asin, acos, atan,
     sinh, cosh, tanh,
@@ -110,6 +111,7 @@ struct expression
             case id::expm1: push_val(expm1(head)); break;
             case id::exp2:  push_val(exp2(head));  break;
             case id::erf:   push_val(erf(head));   break;
+            case id::erfc:  push_val(erfc(head));  break;
             case id::log:   push_val(log(head));   break;
             case id::log1p: push_val(log1p(head)); break;
             case id::log2:  push_val(log2(head));  break;
@@ -249,6 +251,7 @@ private:
                              TAO_PEGTL_STRING("exp2"),
                              TAO_PEGTL_STRING("expm1"),
                              TAO_PEGTL_STRING("exp"),
+                             TAO_PEGTL_STRING("erfc"),
                              TAO_PEGTL_STRING("erf"),
                              TAO_PEGTL_STRING("double"),
                              TAO_PEGTL_STRING("cbrt"),
@@ -416,9 +419,10 @@ struct expression::action<expression::r_unary_fun>
             { "abs",   id::abs },
             { "sqrt",  id::sqrt },
             { "cbrt",  id::cbrt },
-            { "exp",   id::exp },
             { "expm1", id::expm1 },
             { "exp2",  id::exp2 },
+            { "exp",   id::exp },
+            { "erfc",  id::erfc },
             { "erf",   id::erf },
             { "log10", id::log10 },
             { "log1p", id::log1p },
