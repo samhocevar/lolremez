@@ -54,7 +54,8 @@ Math functions:
 
  - *abs()* (absolute value)
  - *sqrt()* (square root), *cbrt()* (cubic root)
- - *exp()*, *exp2()*, *erf()*, *log()*, *log2()*, *log10()*
+ - *exp()*, *exp2()*, *expm1()*, *erf()*, *erfc()*, *erfcx()*,
+ - *log()*, *log2()*, *log10()*, *log1p()*
  - *sin()*, *cos()*, *tan()*
  - *asin()*, *acos()*, *atan()*
  - *sinh()*, *cosh()*, *tanh()*
@@ -63,6 +64,11 @@ Parsing rules:
 
  - *-a^b* is *-(a^b)*
  - *a^b^c* is *(a^b)^c*
+
+## Limitations
+
+As of now, the `erf()` family of function is inaccurate in the [7,19] range.
+See [this issue](https://github.com/lolengine/lol/issues/2)
 
 ## Build LolRemez
 
