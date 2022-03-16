@@ -16,6 +16,7 @@
 
 #include <iostream>
 #include <iomanip>
+#include <array>
 
 #include <lol/real>
 
