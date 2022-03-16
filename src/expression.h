@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2020 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005–2022 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -468,7 +468,8 @@ struct expression::action<expression::r_sup_float>
     {
         lol::real val = lol::real::R_0();
 
-        for (char const *p = in.string().c_str(); *p; )
+        auto const &sup = in.string();
+        for (char const *p = sup.c_str(); *p; )
         {
             val *= lol::real::R_10();
 
