@@ -220,6 +220,9 @@ int main(int argc, char **argv)
     solver.show_stats = show_stats;
     solver.show_debug = show_debug;
 
+    if (!solver.check_sanity())
+        return EXIT_FAILURE;
+
     // Solve polynomial
     solver.do_init();
     for (int iteration = 0; ; ++iteration)

@@ -83,6 +83,38 @@ void remez_solver::set_root_finder(root_finder rf)
     m_rf = rf;
 }
 
+bool remez_solver::check_sanity() const
+{
+    // Check that the weight function has no zeroes
+    if (m_has_weight)
+    {
+        int const steps = 64;
+        real prev_fx = real::R_0();
+        real delta = (m_xmax - m_xmin) / steps;
+        for (int i = 0; i <= steps; ++i)
+        {
+            real x = m_xmin + real(i) * delta;
+            real fx = m_weight.eval(x);
+            if (fx.is_zero())
+            {
+                std::cout << "Error: weight function is zero at x = " << x << '\n';
+                return false;
+            }
+
+            if (i > 0 && (fx * prev_fx).is_negative())
+            {
+                std::cout << "Error: weight function is zero somewhere in "
+                             "[ " << (x - delta) << ", " << x << " ]\n";
+                return false;
+            }
+
+            prev_fx = fx;
+        }
+    }
+
+    return true;
+}
+
 void remez_solver::do_init()
 {
     m_k1 = (m_xmax + m_xmin) / 2;

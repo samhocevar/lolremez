@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005–2020 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005–2022 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -53,6 +53,8 @@ public:
     void set_func(expression const &expr);
     void set_weight(expression const &expr);
     void set_root_finder(root_finder rf);
+
+    bool check_sanity() const;
 
     void do_init();
     bool do_step();
