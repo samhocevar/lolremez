@@ -112,6 +112,7 @@ int main(int argc, char **argv)
     bool show_stats = false;
     bool show_progress = false;
     bool show_debug = false;
+    bool no_checks = false;
 
     std::string expr;
     std::optional<std::string> error, range;
@@ -141,6 +142,7 @@ int main(int argc, char **argv)
     opts.add_flag("--progress", show_progress, "print progress");
     opts.add_flag("--stats", show_stats, "print timing statistics");
     opts.add_flag("--debug", show_debug, "print debug messages");
+    opts.add_flag("--no-checks", no_checks, "disable sanity checks");
     // Expression to evaluate and optional error expression
     opts.add_option("expression", expr)->type_name("<x-expression>")->required();
     opts.add_option("error", error)->type_name("<x-expression>");
@@ -220,7 +222,7 @@ int main(int argc, char **argv)
     solver.show_stats = show_stats;
     solver.show_debug = show_debug;
 
-    if (!solver.check_sanity())
+    if (!no_checks && !solver.check_sanity())
         return EXIT_FAILURE;
 
     // Solve polynomial
