@@ -71,8 +71,8 @@ struct linear_system : public array2d<T>
     {
         auto n = this->cols();
 
-        for (int j = 0; j < n; j++)
-            for (int i = 0; i < n; i++)
+        for (size_t j = 0; j < n; j++)
+            for (size_t i = 0; i < n; i++)
                 (*this)[j][i] = (i == j) ? x : (T)0;
     }
 
@@ -86,18 +86,18 @@ struct linear_system : public array2d<T>
 
         /* Inversion method: iterate through all columns and make sure
          * all the terms are 1 on the diagonal and 0 everywhere else */
-        for (int i = 0; i < n; i++)
+        for (size_t i = 0; i < n; i++)
         {
             /* If the expected coefficient is zero, add one of
              * the other lines. The first we meet will do. */
             if (!a[i][i])
             {
-                for (int j = i + 1; j < n; j++)
+                for (size_t j = i + 1; j < n; j++)
                 {
                     if (!a[j][i])
                         continue;
                     /* Add row j to row i */
-                    for (int k = 0; k < n; k++)
+                    for (size_t k = 0; k < n; k++)
                     {
                         a[i][k] += a[j][k];
                         b[i][k] += b[j][k];
@@ -109,12 +109,12 @@ struct linear_system : public array2d<T>
             /* Now we know the diagonal term is non-zero. Get its inverse
              * and use that to nullify all other terms in the column */
             T x = (T)1 / a[i][i];
-            for (int j = 0; j < n; j++)
+            for (size_t j = 0; j < n; j++)
             {
                 if (j == i)
                     continue;
                 T mul = x * a[j][i];
-                for (int k = 0; k < n; k++)
+                for (size_t k = 0; k < n; k++)
                 {
                     a[j][k] -= mul * a[i][k];
                     b[j][k] -= mul * b[i][k];
@@ -122,7 +122,7 @@ struct linear_system : public array2d<T>
             }
 
             /* Finally, ensure the diagonal term is 1 */
-            for (int k = 0; k < n; k++)
+            for (size_t k = 0; k < n; k++)
             {
                 a[i][k] *= x;
                 b[i][k] *= x;

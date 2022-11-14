@@ -15,7 +15,7 @@ AM_INIT_AUTOMAKE([subdir-objects no-define tar-ustar silent-rules dist-xz dist-z
 AM_DEFAULT_VERBOSITY=0
 
 dnl  FIXME: move this to a checks section
-CXXFLAGS="${CXXFLAGS} -std=c++17 -Os"
+CXXFLAGS="${CXXFLAGS} -std=c++17 -Os -Wall -Wextra"
 LDFLAGS="-lpthread"
 
 AC_PROG_CXX

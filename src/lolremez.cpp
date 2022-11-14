@@ -49,6 +49,7 @@ static std::string bugs =
     "issue page: https://github.com/samhocevar/lolremez/issues\n";
 
 // FIXME: improve --version output by maybe reusing this function
+#if 0
 static void version()
 {
     std::cout
@@ -57,8 +58,10 @@ static void version()
         << copyright
         << bugs;
 }
+#endif
 
 // FIXME: improve --help output by maybe adding some messages
+#if 0
 static void usage()
 {
     std::cout
@@ -78,6 +81,7 @@ static void usage()
         << footer
         << bugs;
 }
+#endif
 
 static void FAIL(char const *message = nullptr, ...)
 {

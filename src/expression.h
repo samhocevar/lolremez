@@ -453,7 +453,7 @@ template<>
 struct expression::action<expression::r_unary_call>
 {
     template<typename INPUT>
-    static void apply(INPUT const &in, expression *that)
+    static void apply(INPUT const &, expression *that)
     {
         that->m_ops.push_back(std::make_tuple(that->m_temp_op.back(), -1));
         that->m_temp_op.pop_back();
