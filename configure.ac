@@ -2,15 +2,15 @@ dnl
 dnl  Configure script for a Lol Engine project
 dnl
 
-AC_INIT(lolremez, 0.7)
+AC_INIT([lolremez],[0.7])
 
 dnl
 dnl  Standard autoconf setup and tools requirements
 dnl
 
-AC_PREREQ(2.50)
+AC_PREREQ([2.71])
 AC_CONFIG_AUX_DIR(.auto)
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([subdir-objects no-define tar-ustar silent-rules dist-xz dist-zip])
 AM_DEFAULT_VERBOSITY=0
 
@@ -19,10 +19,10 @@ CXXFLAGS="${CXXFLAGS} -std=c++17 -Os -Wall -Wextra"
 LDFLAGS="-lpthread"
 
 AC_PROG_CXX
-AM_PROG_LIBTOOL
-AC_LIBTOOL_CXX
+LT_INIT
+LT_LANG([C++])
 
-AC_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 AC_CONFIG_FILES(
  [Makefile

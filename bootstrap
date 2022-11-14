@@ -2,7 +2,7 @@
 
 # bootstrap: generic bootstrap/autogen.sh script for autotools projects
 #
-# Copyright (c) 2002-2010 Sam Hocevar <sam@hocevar.net>
+# Copyright © 2002–2022 Sam Hocevar <sam@hocevar.net>
 #
 #    This program is free software. It comes without any warranty, to
 #    the extent permitted by applicable law. You can redistribute it
@@ -29,7 +29,7 @@ fi
 # Check for needed features
 auxdir="`sed -ne 's/^[ \t]*A._CONFIG_AUX_DIR *([[ ]*\([^] )]*\).*/\1/p' $conffile`"
 pkgconfig="`grep '^[ \t]*PKG_PROG_PKG_CONFIG' $conffile >/dev/null 2>&1 && echo yes || echo no`"
-libtool="`grep '^[ \t]*A._PROG_LIBTOOL' $conffile >/dev/null 2>&1 && echo yes || echo no`"
+libtool="`grep '^[ \t]*\(A._PROG_LIBTOOL\|LT_INIT\)' $conffile >/dev/null 2>&1 && echo yes || echo no`"
 makefile="`[ -f Makefile.am ] && echo yes || echo no`"
 aclocalflags="`sed -ne 's/^[ \t]*ACLOCAL_AMFLAGS[ \t]*=//p' Makefile.am 2>/dev/null || :`"
 
