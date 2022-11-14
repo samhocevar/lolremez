@@ -237,7 +237,7 @@ private:
                                _, one<')'>> {};
 
     // r_unary_call <- <r_unary_fun> "(" r_expr ")"
-    // XXX: “log2” must come before “log” etc. because the parser is greedy.
+    // XXX: “log2” must come before “log” etc. because the parser exits early.
     struct r_unary_fun : sor<TAO_PEGTL_STRING("tanh"),
                              TAO_PEGTL_STRING("tan"),
                              TAO_PEGTL_STRING("sqrt"),

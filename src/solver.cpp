@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2020 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005–2020 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -229,9 +229,7 @@ void remez_solver::remez_step()
  * Find m_order + 1 zeros of the error function. No need to compute the
  * relative error: its zeros are at the same place as the absolute error!
  *
- * The algorithm used here is the midpoint algorithm, which is guaranteed
- * to converge in fixed time. I tried naïve regula falsi which sometimes
- * would be very efficient, but it often performed poorly.
+ * The algorithm used here can be selected at runtime.
  */
 void remez_solver::find_zeros()
 {

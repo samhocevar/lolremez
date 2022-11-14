@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005—2020 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005–2022 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -29,7 +29,7 @@
 using lol::real;
 
 static std::string copyright =
-    "Copyright © 2005—2020 Sam Hocevar <sam@hocevar.net>\n"
+    "Copyright © 2005–2022 Sam Hocevar <sam@hocevar.net>\n"
     "This program is free software. It comes without any warranty, to the extent\n"
     "permitted by applicable law. You can redistribute it and/or modify it under\n"
     "the terms of the Do What the Fuck You Want to Public License, Version 2, as\n"
@@ -38,8 +38,8 @@ static std::string copyright =
 static std::string footer =
     "\n"
     "Examples:\n"
-    "  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\"\n"
-    "  lolremez -d 4 -r -1:1 \"atan(exp(1+x))\" \"exp(1+x)\"\n"
+    "  lolremez --degree 4 --range -1:1 \"atan(exp(1+x))\"\n"
+    "  lolremez --degree 4 --range -1:1 \"atan(exp(1+x))\" \"exp(1+x)\"\n"
     "\n"
     "Tutorial available on https://github.com/samhocevar/lolremez/wiki\n";
 
@@ -58,7 +58,7 @@ static void version()
         << bugs;
 }
 
-// FIXME: improve --help output by mayne adding some messages
+// FIXME: improve --help output by maybe adding some messages
 static void usage()
 {
     std::cout
@@ -132,11 +132,11 @@ int main(int argc, char **argv)
     opts.add_flag("--float", [&](int64_t) { mode = mode_float; }, "use float type");
     opts.add_flag("--double", [&](int64_t) { mode = mode_double; }, "use double type");
     opts.add_flag("--long-double", [&](int64_t) { mode = mode_long_double; }, "use long double type");
-    opts.add_flag("--bisect", [&](int64_t) { rf = root_finder::bisect; }, "use bisection for root finding");
-    opts.add_flag("--regula-falsi", [&](int64_t) { rf = root_finder::regula_falsi; }, "use regula falsi for root finding");
-    opts.add_flag("--illinois", [&](int64_t) { rf = root_finder::illinois; }, "use Illinois algorithm for root finding");
-    opts.add_flag("--pegasus", [&](int64_t) { rf = root_finder::pegasus; }, "use Pegasus algorithm for root finding (default)");
-    opts.add_flag("--ford", [&](int64_t) { rf = root_finder::ford; }, "use Ford algorithm for root finding");
+    opts.add_flag("--bisect", [&](int64_t) { rf = root_finder::bisect; }, "root finding: use bisection");
+    opts.add_flag("--regula-falsi", [&](int64_t) { rf = root_finder::regula_falsi; }, "root finding: use regula falsi");
+    opts.add_flag("--illinois", [&](int64_t) { rf = root_finder::illinois; }, "root finding: use Illinois algorithm");
+    opts.add_flag("--pegasus", [&](int64_t) { rf = root_finder::pegasus; }, "root finding: use Pegasus algorithm (default)");
+    opts.add_flag("--ford", [&](int64_t) { rf = root_finder::ford; }, "root finding: use Ford algorithm");
     // Runtime flags
     opts.add_flag("--progress", show_progress, "print progress");
     opts.add_flag("--stats", show_stats, "print timing statistics");
