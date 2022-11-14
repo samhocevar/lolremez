@@ -102,6 +102,32 @@ installation location, or run the following:
 
     sudo make install
 
+## Docker
+
+A docker image can easily be built using the provided [Dockerfile](./Dockerfile)
+
+```bash
+docker build -t lolremez .
+```
+This command will create a local Docker image "lolremez", you can the invoke `lolremez` as follows:
+
+```
+docker run --rm lolremez --double -d 5 -r "sqrt(2):pi²" "atan(sqrt(3+x³)-exp(1+x))"
+// Approximation of f(x) = atan(sqrt(3+x³)-exp(1+x))
+// on interval [ sqrt(2), pi² ]
+// with a polynomial of degree 5.
+// p(x)=((((-3.9557569330471555e-5*x+1.2947712130833294e-3)*x-1.6541397035559147e-2)*x+1.0351664953941214e-1)*x-3.2051562487328135e-1)*x-1.1703528319321961
+double f(double x)
+{
+    double u = -3.9557569330471555e-5;
+    u = u * x + 1.2947712130833294e-3;
+    u = u * x + -1.6541397035559147e-2;
+    u = u * x + 1.0351664953941214e-1;
+    u = u * x + -3.2051562487328135e-1;
+    return u * x + -1.1703528319321961;
+}
+```
+
 ## Changes
 
 ### News for LolRemez 0.7:
