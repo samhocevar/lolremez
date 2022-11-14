@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005–2020 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005–2022 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -17,8 +17,8 @@
 #include <functional>
 #include <iostream>
 #include <iomanip>
+#include <thread>
 
-#include <lol/thread>
 #include <lol/real>
 #include <lol/math>
 
@@ -29,8 +29,8 @@ using lol::real;
 
 remez_solver::remez_solver()
 {
-    /* Spawn 4 worker threads */
-    for (int i = 0; i < 4; ++i)
+    /* Spawn worker threads */
+    for (unsigned int i = 0; i < std::thread::hardware_concurrency(); ++i)
     {
         auto th = new thread(std::bind(&remez_solver::worker_thread, this));
         m_workers.push_back(th);
@@ -415,6 +415,8 @@ void remez_solver::worker_thread()
                     // Method 4 of https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.53.8676
                     // by J. A. Ford
                     pd->err *= real::R_1() - c.err / ps->err - c.err / pd->err;
+                    break;
+                default:
                     break;
                 }
             }
