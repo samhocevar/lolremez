@@ -1,9 +1,16 @@
-FROM alpine:3.13 as build
+FROM bitnami/minideb:latest as build
 
-RUN apk add build-base binutils autoconf automake libtool pkgconfig check-dev file patch git
+RUN install_packages \
+    build-essential \
+    binutils \
+    autoconf \
+    automake \
+    libtool \
+    pkg-config \
+    file \
+    git
 
 COPY / /lolremez/
-#RUN git clone https://github.com/samhocevar/lolremez.git
 
 WORKDIR /lolremez/
 
@@ -13,9 +20,7 @@ RUN ./bootstrap \
     && ./configure \
     && make
 
-FROM alpine:3.13
-
-RUN apk add libstdc++
+FROM bitnami/minideb:latest
 
 COPY --from=build lolremez/lolremez /
 
