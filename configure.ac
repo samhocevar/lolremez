@@ -8,7 +8,7 @@ dnl
 dnl  Standard autoconf setup and tools requirements
 dnl
 
-AC_PREREQ([2.71])
+AC_PREREQ([2.69])
 AC_CONFIG_AUX_DIR(.auto)
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE([subdir-objects no-define tar-ustar silent-rules dist-xz dist-zip])
@@ -16,7 +16,8 @@ AM_DEFAULT_VERBOSITY=0
 
 dnl  FIXME: move this to a checks section
 CXXFLAGS="${CXXFLAGS} -std=c++17 -Os -Wall -Wextra"
-LDFLAGS="-lpthread"
+dnl  XXX: this is required for old glibc versions (https://stackoverflow.com/q/46994982/111461)
+LDFLAGS="-pthread"
 
 AC_PROG_CXX
 LT_INIT
