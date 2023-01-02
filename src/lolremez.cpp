@@ -263,11 +263,10 @@ int main(int argc, char **argv)
     auto p = solver.get_estimate();
     char const *type = mode == mode_float ? "float" :
                        mode == mode_double ? "double" : "long double";
-    std::cout << "// Approximation of f(x) = " << expr << '\n';
+    std::cout << "// Degree " << p.degree() << " approximation of f(x) = " << expr << '\n';
     if (error)
         std::cout << "// with weight function g(x) = " << *error << '\n';
     std::cout << "// on interval [ " << str_xmin << ", " << str_xmax << " ]\n";
-    std::cout << "// with a polynomial of degree " << p.degree() << ".\n";
 
     // Print expression in Horner form
     std::cout << std::setprecision(digits);
@@ -279,6 +278,7 @@ int main(int argc, char **argv)
         std::cout << (j < p.degree() - 1 ? ")" : "") << "*x"
                   << (p[j] > real::R_0() ? "+" : "") << p[j];
     std::cout << '\n';
+    std::cout << "// Estimated max error: " << solver.get_error() << '\n';
 
     // Print C/C++ function
     std::cout << std::setprecision(digits);

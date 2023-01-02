@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005–2022 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005–2023 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -60,6 +60,7 @@ public:
     bool do_step();
 
     lol::polynomial<lol::real> get_estimate() const;
+    lol::real get_error() const { return m_error; }
 
     bool show_stats = false;
     bool show_debug = false;
