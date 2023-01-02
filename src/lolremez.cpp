@@ -1,7 +1,7 @@
 //
 //  LolRemez — Remez algorithm implementation
 //
-//  Copyright © 2005–2022 Sam Hocevar <sam@hocevar.net>
+//  Copyright © 2005–2023 Sam Hocevar <sam@hocevar.net>
 //
 //  This program is free software. It comes without any warranty, to
 //  the extent permitted by applicable law. You can redistribute it
@@ -113,6 +113,7 @@ int main(int argc, char **argv)
     mode = mode_default;
     root_finder rf = root_finder::pegasus;
 
+    bool display_hex = false;
     bool show_stats = false;
     bool show_progress = false;
     bool show_debug = false;
@@ -137,12 +138,14 @@ int main(int argc, char **argv)
     opts.add_flag("--float", [&](int64_t) { mode = mode_float; }, "use float type");
     opts.add_flag("--double", [&](int64_t) { mode = mode_double; }, "use double type");
     opts.add_flag("--long-double", [&](int64_t) { mode = mode_long_double; }, "use long double type");
+    // Root finding algorithms
     opts.add_flag("--bisect", [&](int64_t) { rf = root_finder::bisect; }, "root finding: use bisection");
     opts.add_flag("--regula-falsi", [&](int64_t) { rf = root_finder::regula_falsi; }, "root finding: use regula falsi");
     opts.add_flag("--illinois", [&](int64_t) { rf = root_finder::illinois; }, "root finding: use Illinois algorithm");
     opts.add_flag("--pegasus", [&](int64_t) { rf = root_finder::pegasus; }, "root finding: use Pegasus algorithm (default)");
     opts.add_flag("--ford", [&](int64_t) { rf = root_finder::ford; }, "root finding: use Ford algorithm");
     // Runtime flags
+    opts.add_flag("--hex", display_hex, "print hexadecimal numbers");
     opts.add_flag("--progress", show_progress, "print progress");
     opts.add_flag("--stats", show_stats, "print timing statistics");
     opts.add_flag("--debug", show_debug, "print debug messages");
@@ -280,6 +283,8 @@ int main(int argc, char **argv)
     // Print C/C++ function
     std::cout << std::setprecision(digits);
     std::cout << type << " f(" << type << " x)\n{\n";
+    if (display_hex)
+        std::cout << std::hexfloat;
     for (int j = p.degree(); j >= 0; --j)
     {
         char const *a = j ? "u = u * x +" : "return u * x +";
@@ -287,16 +292,15 @@ int main(int argc, char **argv)
             std::cout << "    " << type << " u = ";
         else
             std::cout << "    " << a << " ";
-        std::cout << p[j];
         switch (mode)
         {
-            case mode_float: std::cout << "f;\n"; break;
-            case mode_double: std::cout << ";\n"; break;
-            case mode_long_double: std::cout << "l;\n"; break;
+            case mode_float: std::cout << float(p[j]) << 'f'; break;
+            case mode_double: std::cout << double(p[j]); break;
+            case mode_long_double: std::cout << (long double)p[j] << 'l'; break;
         }
+        std::cout << ";\n";
     }
     std::cout << "}\n";
 
     return 0;
 }
-
