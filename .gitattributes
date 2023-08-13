@@ -15,6 +15,12 @@
 # Vim doesn't like CRLF, even on Windows.
 *.vim text eol=lf
 
+# This allows autoconf/automake to work with the Linux subsystem
+*.m4 text eol=lf
+*.ac text eol=lf
+*.am text eol=lf
+bootstrap text eol=lf
+
 # This is Windows-specific and should always have CRLF, or
 # Visual Studio may misbehave.
 *.sln     text eol=crlf
