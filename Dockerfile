@@ -8,7 +8,8 @@ RUN install_packages \
     libtool \
     pkg-config \
     file \
-    git
+    git \
+    ca-certificates
 
 COPY / /lolremez/
 
